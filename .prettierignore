@@ -1,0 +1,11 @@
+node_modules
+dist
+build
+coverage
+pnpm-lock.yaml
+*.min.js
+apps/app/android
+apps/app/ios
+**/prisma/migrations
+apps-mobile
+mobile

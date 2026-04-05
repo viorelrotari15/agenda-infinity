@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SPECIALIST
+  CLIENT
+}
+
+enum BookingStatus {
+  CREATED
+  ACCEPTED
+  DENIED
+  CANCELLED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  phone     String?
+  fcmToken  String?
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  specialist SpecialistProfile?
+  bookings  Booking[] @relation("ClientBookings")
+}
+
+model SpecialistProfile {
+  id          String   @id @default(cuid())
+  userId       String   @unique
+  displayName  String
+  slug         String   @unique
+  timezone     String   @default("UTC")
+  /// YYYY-MM-DD in specialist timezone; last day we sent the morning digest
+  morningDigestSentForLocalDate String?
+  user         User     @relation(fields: [userId], references: [id])
+  services     Service[]
+  workingHours WorkingHoursRule[]
+  availabilityBlocks AvailabilityBlock[]
+  bookings     Booking[]
+}
+
+model AvailabilityBlock {
+  id             String   @id @default(cuid())
+  specialistId   String
+  startUtc       DateTime
+  endUtc         DateTime
+  note           String?
+  specialist     SpecialistProfile @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+
+  @@index([specialistId, startUtc, endUtc])
+}
+
+model ServiceType {
+  id                     String   @id @default(cuid())
+  name                   String
+  defaultDurationMinutes Int
+  defaultBufferMinutes   Int      @default(0)
+  active                 Boolean  @default(true)
+  sortOrder              Int      @default(0)
+  services               Service[]
+}
+
+model Banner {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  title     String
+  subtitle  String?
+  linkUrl   String?
+  sortOrder Int      @default(0)
+  active    Boolean  @default(true)
+}
+
+model Service {
+  id              String   @id @default(cuid())
+  specialistId    String
+  serviceTypeId   String?
+  name            String
+  durationMinutes Int
+  bufferMinutes   Int      @default(0)
+  active          Boolean  @default(true)
+  specialist      SpecialistProfile @relation(fields: [specialistId], references: [id])
+  serviceType     ServiceType? @relation(fields: [serviceTypeId], references: [id])
+  bookings        Booking[]
+}
+
+model WorkingHoursRule {
+  id           String @id @default(cuid())
+  specialistId String
+  dayOfWeek    Int
+  startLocal   String
+  endLocal     String
+  specialist   SpecialistProfile @relation(fields: [specialistId], references: [id])
+}
+
+model Booking {
+  id                 String   @id @default(cuid())
+  specialistId       String
+  serviceId          String
+  clientUserId       String?
+  clientName         String
+  clientEmail        String
+  clientPhone        String?
+  startUtc           DateTime
+  endUtc             DateTime
+  status             BookingStatus @default(CREATED)
+  recurrenceSeriesId String?
+  recurrenceRrule    String?
+  createdAt          DateTime @default(now())
+  /// Set when morning push/SMS/email reminder was sent for this booking
+  morningReminderSentAt DateTime?
+  /// Set when the ~2h-before push/SMS/email reminder was sent
+  twoHourReminderSentAt DateTime?
+
+  specialist SpecialistProfile @relation(fields: [specialistId], references: [id])
+  service    Service           @relation(fields: [serviceId], references: [id])
+  client     User?             @relation("ClientBookings", fields: [clientUserId], references: [id])
+
+  @@index([specialistId, startUtc, endUtc])
+}

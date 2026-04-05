@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="paper" x1="120" y1="120" x2="900" y2="960" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fafbff"/>
+      <stop offset="1" stop-color="#f1f3f8"/>
+    </linearGradient>
+    <linearGradient id="duo" x1="240" y1="520" x2="784" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6d28d9"/>
+      <stop offset="0.55" stop-color="#4f46e5"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="
+        0 0 0 0 0
+        0 0 0 0 0
+        0 0 0 0 0
+        0 0 0 0.12 0" result="s"/>
+      <feMerge>
+        <feMergeNode in="s"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Rounded-square app icon background -->
+  <rect x="64" y="64" width="896" height="896" rx="210" fill="url(#paper)"/>
+
+  <!-- Bold infinity mark -->
+  <g filter="url(#shadow)">
+    <path
+      d="M318 520
+         C318 416 388 350 472 350
+         C540 350 592 392 640 450
+         C688 392 740 350 808 350
+         C892 350 962 416 962 520
+         C962 624 892 690 808 690
+         C740 690 688 648 640 590
+         C592 648 540 690 472 690
+         C388 690 318 624 318 520
+         Z
+         M472 418
+         C430 418 394 454 394 520
+         C394 586 430 622 472 622
+         C510 622 545 598 588 552
+         C544 504 509 418 472 418
+         Z
+         M808 418
+         C771 418 736 504 692 552
+         C735 598 770 622 808 622
+         C850 622 886 586 886 520
+         C886 454 850 418 808 418
+         Z"
+      fill="url(#duo)" fill-rule="evenodd"
+    />
+
+    <!-- integrated checklist squares -->
+    <g>
+      <rect x="430" y="478" width="40" height="40" rx="10" fill="#ffffff" fill-opacity="0.92"/>
+      <rect x="556" y="504" width="40" height="40" rx="10" fill="#ffffff" fill-opacity="0.92"/>
+      <rect x="676" y="478" width="40" height="40" rx="10" fill="#a3ff4a" fill-opacity="0.95"/>
+      <path d="M686 498l10 10 22-24" fill="none" stroke="#1f2937" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+</svg>

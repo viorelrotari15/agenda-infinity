@@ -1,0 +1,41 @@
+{
+  "name": "agenda-infinity",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "mobile": "pnpm --filter @agenda/app run mobile",
+    "android": "pnpm --filter @agenda/app run android",
+    "ios": "pnpm --filter @agenda/app run ios",
+    "lint": "turbo run lint && prettier --check .",
+    "lint:fix": "turbo run lint:fix && prettier --write .",
+    "lint:eslint": "eslint .",
+    "lint:eslint:fix": "eslint --fix .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:generate": "pnpm --filter @agenda/api exec prisma generate",
+    "db:migrate": "pnpm --filter @agenda/api exec prisma migrate dev",
+    "db:push": "pnpm --filter @agenda/api exec prisma db push",
+    "db:seed": "pnpm --filter @agenda/api run seed",
+    "api:docker": "docker compose up --build api",
+    "docker:up": "docker compose up --build",
+    "docker:up:detached": "docker compose up --build -d"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.4.0",
+    "prettier": "^3.8.1",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.58.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20"
+  }
+}

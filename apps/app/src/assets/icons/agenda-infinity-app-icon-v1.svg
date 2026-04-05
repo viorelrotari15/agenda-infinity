@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="140" y1="120" x2="900" y2="980" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#07132a"/>
+      <stop offset="0.55" stop-color="#0b1b3a"/>
+      <stop offset="1" stop-color="#182a5a"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="260" y1="520" x2="764" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="0.55" stop-color="#2dd4bf"/>
+      <stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="calendarTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.06"/>
+    </linearGradient>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="
+        1 0 0 0 0
+        0 1 0 0 0
+        0 0 1 0 0
+        0 0 0 0.35 0" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Rounded-square app icon background -->
+  <rect x="64" y="64" width="896" height="896" rx="210" fill="url(#bg)"/>
+
+  <!-- Subtle calendar header bar -->
+  <g opacity="0.95">
+    <rect x="238" y="252" width="548" height="84" rx="32" fill="url(#calendarTop)"/>
+    <rect x="306" y="226" width="46" height="86" rx="23" fill="#ffffff" fill-opacity="0.20"/>
+    <rect x="672" y="226" width="46" height="86" rx="23" fill="#ffffff" fill-opacity="0.20"/>
+  </g>
+
+  <!-- Infinity mark with gentle calendar page shoulders -->
+  <g filter="url(#softGlow)">
+    <!-- main loop -->
+    <path
+      d="M350 520
+         C350 410 430 350 512 350
+         C595 350 674 410 674 520
+         C674 630 595 690 512 690
+         C430 690 350 630 350 520
+         Z
+         M512 412
+         C460 412 418 454 418 520
+         C418 586 460 628 512 628
+         C565 628 606 586 606 520
+         C606 454 565 412 512 412
+         Z"
+      fill="url(#mark)" fill-rule="evenodd"
+    />
+    <!-- inner infinity pinch -->
+    <path
+      d="M376 520
+         C420 468 466 452 512 452
+         C558 452 604 468 648 520
+         C604 572 558 588 512 588
+         C466 588 420 572 376 520
+         Z"
+      fill="#07132a" fill-opacity="0.88"
+    />
+
+    <!-- accent dot (warm coral) -->
+    <circle cx="742" cy="614" r="20" fill="#ff6b6b"/>
+  </g>
+</svg>
