@@ -22,6 +22,7 @@ export default tseslint.config(
       'playwright.config.ts',
       '**/vitest.config.ts',
       'apps/api/jest.config.cjs',
+      'perf/**',
     ],
   },
   eslint.configs.recommended,

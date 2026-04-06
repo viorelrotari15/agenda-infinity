@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { isWithinWorkingHours, slotTimeRange } from './bookingCalendarUtils';
+import {
+  bookingTimelinePlacement,
+  dayWorkingMinutesRange,
+  isWithinWorkingHours,
+  slotTimeRange,
+  toBusinessHours,
+} from './bookingCalendarUtils';
 
 describe('slotTimeRange', () => {
   it('uses defaults when there are no rules', () => {
@@ -44,5 +50,65 @@ describe('isWithinWorkingHours', () => {
     const start = new Date('2026-04-06T23:00:00');
     const end = new Date('2026-04-07T01:00:00');
     expect(isWithinWorkingHours(start, end, monday)).toBe(false);
+  });
+});
+
+describe('toBusinessHours', () => {
+  it('maps rules to FullCalendar-style segments', () => {
+    const out = toBusinessHours([{ dayOfWeek: 2, startLocal: '09:30', endLocal: '17:00' }]);
+    expect(out).toHaveLength(1);
+    expect(out[0].daysOfWeek).toEqual([2]);
+    expect(out[0].startTime).toBe('09:30:00');
+    expect(out[0].endTime).toBe('17:00:00');
+  });
+});
+
+describe('dayWorkingMinutesRange', () => {
+  const rules = [
+    { dayOfWeek: 3, startLocal: '10:00', endLocal: '12:00' },
+    { dayOfWeek: 3, startLocal: '14:00', endLocal: '18:00' },
+  ];
+
+  it('returns union min/max minutes for that weekday', () => {
+    const day = new Date(2026, 3, 8);
+    expect(day.getDay()).toBe(3);
+    const r = dayWorkingMinutesRange(rules, day);
+    expect(r).toEqual({ startMin: 10 * 60, endMin: 18 * 60 });
+  });
+
+  it('returns null when no rules for weekday', () => {
+    const day = new Date(2026, 3, 6);
+    expect(dayWorkingMinutesRange(rules, day)).toBeNull();
+  });
+});
+
+describe('bookingTimelinePlacement', () => {
+  const day = new Date(2026, 3, 5, 0, 0, 0);
+  const range = { startMin: 9 * 60, endMin: 17 * 60 };
+
+  it('returns null when total window is non-positive', () => {
+    expect(
+      bookingTimelinePlacement(
+        new Date(2026, 3, 5, 10, 0, 0),
+        new Date(2026, 3, 5, 11, 0, 0),
+        day,
+        { startMin: 100, endMin: 100 },
+      ),
+    ).toBeNull();
+  });
+
+  it('places an event inside the working window', () => {
+    const start = new Date(2026, 3, 5, 10, 0, 0);
+    const end = new Date(2026, 3, 5, 11, 0, 0);
+    const p = bookingTimelinePlacement(start, end, day, range);
+    expect(p).not.toBeNull();
+    expect(p!.topPct).toBeGreaterThanOrEqual(0);
+    expect(p!.heightPct).toBeGreaterThan(0);
+  });
+
+  it('returns null when event is entirely outside window', () => {
+    const start = new Date(2026, 3, 5, 7, 0, 0);
+    const end = new Date(2026, 3, 5, 8, 0, 0);
+    expect(bookingTimelinePlacement(start, end, day, range)).toBeNull();
   });
 });

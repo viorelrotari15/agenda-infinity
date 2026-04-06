@@ -61,4 +61,75 @@ describe('AgendaApiClient', () => {
     const sp = await client.getSpecialistBySlug('hello world');
     expect(sp.displayName).toBe('H');
   });
+
+  it('lists banners', async () => {
+    nock(BASE)
+      .get('/banners')
+      .reply(200, [
+        { id: 'b1', imageUrl: '/x.png', title: 'Hi', subtitle: null, linkUrl: null, sortOrder: 0 },
+      ]);
+
+    const client = new AgendaApiClient(BASE);
+    const list = await client.listBanners();
+    expect(list).toHaveLength(1);
+    expect(list[0].title).toBe('Hi');
+  });
+
+  it('refreshes tokens', async () => {
+    nock(BASE).post('/auth/refresh').reply(200, { accessToken: 'a', refreshToken: 'r' });
+    const client = new AgendaApiClient(BASE);
+    const t = await client.refresh('old-refresh');
+    expect(t.accessToken).toBe('a');
+  });
+
+  it('requests availability with query string', async () => {
+    nock(BASE)
+      .get(
+        '/specialists/sp1/availability?serviceId=svc1&from=2026-04-05T00%3A00%3A00.000Z&to=2026-04-06T00%3A00%3A00.000Z',
+      )
+      .reply(200, []);
+
+    const client = new AgendaApiClient(BASE);
+    const slots = await client.getAvailability({
+      specialistId: 'sp1',
+      serviceId: 'svc1',
+      from: '2026-04-05T00:00:00.000Z',
+      to: '2026-04-06T00:00:00.000Z',
+    });
+    expect(slots).toEqual([]);
+  });
+
+  it('lists specialist bookings in range', async () => {
+    nock(BASE).get('/specialist/bookings?from=2026-04-01&to=2026-04-30').reply(200, []);
+
+    const client = new AgendaApiClient(BASE, () => 'tok');
+    const ev = await client.specialistBookings({ from: '2026-04-01', to: '2026-04-30' });
+    expect(ev).toEqual([]);
+  });
+
+  it('encodes specialist booking id in path', async () => {
+    nock(BASE).get('/specialist/bookings/abc%2F123').reply(200, {
+      id: 'abc/123',
+      title: 'T',
+      start: '2026-04-05T10:00:00.000Z',
+      end: '2026-04-05T11:00:00.000Z',
+      status: 'CREATED',
+      serviceName: 'S',
+      clientName: 'C',
+      clientEmail: 'e@e.e',
+      serviceId: 's1',
+      durationMinutes: 30,
+    });
+
+    const client = new AgendaApiClient(BASE, () => 'tok');
+    const d = await client.specialistBooking('abc/123');
+    expect(d.id).toBe('abc/123');
+  });
+
+  it('sends Accept-Language when getter is provided', async () => {
+    nock(BASE).matchHeader('accept-language', 'ro').get('/specialists').reply(200, []);
+
+    const client = new AgendaApiClient(BASE, undefined, () => 'ro');
+    await client.listSpecialists();
+  });
 });

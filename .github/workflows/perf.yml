@@ -1,0 +1,63 @@
+name: Performance stress
+
+# Runs load tests against the API. Start manually after merging, or tune thresholds in perf/autocannon-stress.mjs
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: perf-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  stress:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build and start stack (Postgres, Redis, API)
+        run: docker compose up -d --build
+
+      - name: Wait for API
+        run: |
+          set -e
+          for i in $(seq 1 120); do
+            if curl -sf "http://127.0.0.1:3001/api/specialists" >/dev/null; then
+              echo "API is ready"
+              exit 0
+            fi
+            echo "waiting... ($i)"
+            sleep 2
+          done
+          echo "API did not become ready in time"
+          docker compose logs --no-color api || true
+          exit 1
+
+      - name: Stress test (autocannon)
+        run: pnpm perf:stress
+        env:
+          BASE_URL: http://127.0.0.1:3001
+          PERF_CONNECTIONS: 40
+          PERF_DURATION_SEC: 40
+          PERF_MAX_P99_MS: 8000
+          PERF_MAX_NON2XX_RATE: 0.1
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
