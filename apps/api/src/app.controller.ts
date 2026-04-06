@@ -76,7 +76,14 @@ export class AppController {
     if (user.role !== 'SPECIALIST') return base;
     const specialist = await this.prisma.specialistProfile.findUnique({
       where: { userId: user.id },
-      select: { id: true, displayName: true, slug: true, timezone: true },
+      select: {
+        id: true,
+        displayName: true,
+        slug: true,
+        timezone: true,
+        publicBio: true,
+        seoTitle: true,
+      },
     });
     return { ...base, specialistProfile: specialist };
   }
@@ -84,7 +91,13 @@ export class AppController {
   @Patch('auth/profile')
   async patchProfile(
     @Headers('authorization') authorization: string | undefined,
-    @Body() body: { phone?: string; fcmToken?: string | null },
+    @Body()
+    body: {
+      phone?: string;
+      fcmToken?: string | null;
+      publicBio?: string | null;
+      seoTitle?: string | null;
+    },
   ) {
     const user = await this.auth.getUserFromToken(authorization);
     const data: { phone?: string | null; fcmToken?: string | null } = {};
@@ -102,6 +115,27 @@ export class AppController {
     if (Object.keys(data).length) {
       await this.prisma.user.update({ where: { id: user.id }, data });
     }
+
+    if (user.role === 'SPECIALIST') {
+      const spData: { publicBio?: string | null; seoTitle?: string | null } = {};
+      if (body.publicBio !== undefined) {
+        const t = typeof body.publicBio === 'string' ? body.publicBio.trim() : '';
+        if (t.length > 8000) throw new BadRequestException(apiT('public_bio_too_long'));
+        spData.publicBio = t.length ? t : null;
+      }
+      if (body.seoTitle !== undefined) {
+        const t = typeof body.seoTitle === 'string' ? body.seoTitle.trim() : '';
+        if (t.length > 200) throw new BadRequestException(apiT('seo_title_too_long'));
+        spData.seoTitle = t.length ? t : null;
+      }
+      if (Object.keys(spData).length) {
+        await this.prisma.specialistProfile.update({
+          where: { userId: user.id },
+          data: spData,
+        });
+      }
+    }
+
     return this.me(authorization);
   }
 
@@ -133,7 +167,14 @@ export class AppController {
   async bySlug(@Param('slug') slug: string) {
     const specialist = await this.prisma.specialistProfile.findUnique({
       where: { slug },
-      select: { id: true, slug: true, displayName: true, timezone: true },
+      select: {
+        id: true,
+        slug: true,
+        displayName: true,
+        timezone: true,
+        publicBio: true,
+        seoTitle: true,
+      },
     });
     if (!specialist) throw new BadRequestException(apiT('specialist_not_found'));
     return specialist;

@@ -10,6 +10,7 @@ import {
   IonSelect,
   IonSelectOption,
   IonText,
+  IonTextarea,
   IonToggle,
 } from '@ionic/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -20,11 +21,13 @@ import { AppHeader } from '../components/AppHeader';
 import { PillSegmentedControl, type PillSegmentOption } from '../components/PillSegmentedControl';
 import { api } from '../lib/api';
 import { hasStoredAccessToken } from '../lib/auth-session';
+import { useSelectModalInterface } from '../hooks/useIsMobileBreakpoint';
 import { useMeQuery } from '../hooks/queries/useMeQuery';
 import { agendaKeys } from '../lib/query-keys';
 
 export default function AdminPage() {
   const { t } = useTranslation();
+  const selectModal = useSelectModalInterface();
   const daysShort = t('daysShort', { returnObjects: true }) as string[];
   const adminTabs = useMemo((): PillSegmentOption<
     'users' | 'hours' | 'blocks' | 'types' | 'banners' | 'services'
@@ -209,6 +212,27 @@ export default function AdminPage() {
     bufferMinutes: 0,
     serviceTypeId: '',
   });
+
+  const [adminPublicBioDraft, setAdminPublicBioDraft] = useState('');
+  const [adminSeoTitleDraft, setAdminSeoTitleDraft] = useState('');
+
+  useEffect(() => {
+    if (!selectedSpecialist) return;
+    setAdminPublicBioDraft(selectedSpecialist.publicBio ?? '');
+    setAdminSeoTitleDraft(selectedSpecialist.seoTitle ?? '');
+  }, [selectedSpecialist]);
+
+  const saveAdminSeoMutation = useMutation({
+    mutationFn: () =>
+      api.adminPatchSpecialistPublicProfile(specialistId, {
+        publicBio: adminPublicBioDraft.trim() ? adminPublicBioDraft.trim() : null,
+        seoTitle: adminSeoTitleDraft.trim() ? adminSeoTitleDraft.trim() : null,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...agendaKeys.all, 'admin', 'specialists'] });
+    },
+  });
+
   const createServiceMutation = useMutation({
     mutationFn: () =>
       api.adminCreateService(specialistId, {
@@ -297,6 +321,13 @@ export default function AdminPage() {
                 <IonItem>
                   <IonLabel position="stacked">{t('admin.role')}</IonLabel>
                   <IonSelect
+                    key={selectModal ? 'if-modal' : 'if-alert'}
+                    interface={selectModal ? 'modal' : 'alert'}
+                    interfaceOptions={
+                      selectModal
+                        ? { header: t('admin.role'), cssClass: 'app-select-modal' }
+                        : undefined
+                    }
                     value={newUser.role}
                     onIonChange={(e) =>
                       setNewUser({ ...newUser, role: e.detail.value as typeof newUser.role })
@@ -350,7 +381,13 @@ export default function AdminPage() {
               <IonItem lines="none">
                 <IonLabel position="stacked">{t('admin.specialistPick')}</IonLabel>
                 <IonSelect
-                  interface="popover"
+                  key={selectModal ? 'if-modal' : 'if-popover'}
+                  interface={selectModal ? 'modal' : 'popover'}
+                  interfaceOptions={
+                    selectModal
+                      ? { header: t('admin.specialistPick'), cssClass: 'app-select-modal' }
+                      : undefined
+                  }
                   placeholder={t('admin.chooseSpecialist')}
                   value={specialistId}
                   onIonChange={(e) => setSpecialistId(String(e.detail.value))}
@@ -590,7 +627,40 @@ export default function AdminPage() {
 
           {tab === 'services' && specialistId ? (
             <section className="admin-section">
-              <h2 className="admin-h2">
+              <h2 className="admin-h2">{t('admin.publicListingSeo')}</h2>
+              <IonText color="medium">
+                <p className="admin-hint">{t('settings.publicListingHint')}</p>
+              </IonText>
+              <IonItem lines="none">
+                <IonTextarea
+                  label={t('settings.publicBio')}
+                  labelPlacement="stacked"
+                  autoGrow
+                  value={adminPublicBioDraft}
+                  onIonInput={(e) => setAdminPublicBioDraft(String(e.detail.value ?? ''))}
+                  rows={4}
+                />
+              </IonItem>
+              <IonItem lines="none">
+                <IonInput
+                  label={t('settings.seoTitle')}
+                  labelPlacement="stacked"
+                  value={adminSeoTitleDraft}
+                  onIonInput={(e) => setAdminSeoTitleDraft(String(e.detail.value ?? ''))}
+                />
+              </IonItem>
+              <IonButton
+                expand="block"
+                onClick={() => saveAdminSeoMutation.mutate()}
+                disabled={saveAdminSeoMutation.isPending}
+              >
+                {t('admin.savePublicListing')}
+              </IonButton>
+              {saveAdminSeoMutation.isError ? (
+                <IonNote color="danger">{(saveAdminSeoMutation.error as Error).message}</IonNote>
+              ) : null}
+
+              <h2 className="admin-h2 ion-margin-top">
                 {t('admin.servicesFor', { name: selectedSpecialist?.displayName ?? '—' })}
               </h2>
               <IonItem>
@@ -615,6 +685,13 @@ export default function AdminPage() {
               <IonItem>
                 <IonLabel position="stacked">{t('admin.serviceTypeOptional')}</IonLabel>
                 <IonSelect
+                  key={selectModal ? 'if-modal' : 'if-alert'}
+                  interface={selectModal ? 'modal' : 'alert'}
+                  interfaceOptions={
+                    selectModal
+                      ? { header: t('admin.serviceTypeOptional'), cssClass: 'app-select-modal' }
+                      : undefined
+                  }
                   value={serviceForm.serviceTypeId}
                   onIonChange={(e) =>
                     setServiceForm({

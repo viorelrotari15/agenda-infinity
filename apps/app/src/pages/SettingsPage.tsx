@@ -14,6 +14,7 @@ import {
   IonSelect,
   IonSelectOption,
   IonText,
+  IonTextarea,
   IonToggle,
 } from '@ionic/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -23,6 +24,7 @@ import { AppHeader } from '../components/AppHeader';
 import { PillSegmentedControl } from '../components/PillSegmentedControl';
 import { api } from '../lib/api';
 import { clearSession, hasStoredAccessToken } from '../lib/auth-session';
+import { useSelectModalInterface } from '../hooks/useIsMobileBreakpoint';
 import { useMeQuery } from '../hooks/queries/useMeQuery';
 import { agendaKeys } from '../lib/query-keys';
 import type { WorkingHoursRule } from '@agenda/shared';
@@ -30,6 +32,7 @@ import i18n from '../i18n/i18n';
 
 export default function SettingsPage() {
   const { t } = useTranslation();
+  const selectModal = useSelectModalInterface();
   const daysShort = t('daysShort', { returnObjects: true }) as string[];
   const queryClient = useQueryClient();
   const meQuery = useMeQuery(hasStoredAccessToken());
@@ -43,14 +46,32 @@ export default function SettingsPage() {
 
   const [section, setSection] = useState<'account' | 'work'>('account');
   const [phoneDraft, setPhoneDraft] = useState('');
+  const [publicBioDraft, setPublicBioDraft] = useState('');
+  const [seoTitleDraft, setSeoTitleDraft] = useState('');
 
   useEffect(() => {
     if (me?.phone) setPhoneDraft(me.phone);
     else setPhoneDraft('');
   }, [me?.phone]);
 
+  useEffect(() => {
+    if (!me?.specialistProfile) return;
+    setPublicBioDraft(me.specialistProfile.publicBio ?? '');
+    setSeoTitleDraft(me.specialistProfile.seoTitle ?? '');
+  }, [me?.specialistProfile]);
+
   const profileMutation = useMutation({
-    mutationFn: () => api.patchProfile({ phone: phoneDraft.trim() || undefined }),
+    mutationFn: () => {
+      const phone = phoneDraft.trim() || undefined;
+      if (me?.role === 'SPECIALIST') {
+        return api.patchProfile({
+          phone,
+          publicBio: publicBioDraft.trim() ? publicBioDraft.trim() : null,
+          seoTitle: seoTitleDraft.trim() ? seoTitleDraft.trim() : null,
+        });
+      }
+      return api.patchProfile({ phone });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: agendaKeys.me() });
     },
@@ -182,7 +203,13 @@ export default function SettingsPage() {
                       <IonItem lines="none" className="settings-item settings-item--field">
                         <IonLabel position="stacked">{t('settings.language')}</IonLabel>
                         <IonSelect
-                          interface="popover"
+                          key={selectModal ? 'if-modal' : 'if-popover'}
+                          interface={selectModal ? 'modal' : 'popover'}
+                          interfaceOptions={
+                            selectModal
+                              ? { header: t('settings.language'), cssClass: 'app-select-modal' }
+                              : undefined
+                          }
                           value={(i18n.resolvedLanguage ?? i18n.language ?? 'en').split('-')[0]}
                           onIonChange={(e) => void i18n.changeLanguage(String(e.detail.value))}
                         >
@@ -198,13 +225,36 @@ export default function SettingsPage() {
                         </IonLabel>
                       </IonItem>
                       {me.specialistProfile ? (
-                        <IonItem lines="none" className="settings-item">
-                          <IonLabel>
-                            <p className="settings-label">{t('settings.publicProfile')}</p>
-                            <p>{me.specialistProfile.displayName}</p>
-                            <p className="settings-muted">/{me.specialistProfile.slug}</p>
-                          </IonLabel>
-                        </IonItem>
+                        <>
+                          <IonItem lines="none" className="settings-item">
+                            <IonLabel>
+                              <p className="settings-label">{t('settings.publicProfile')}</p>
+                              <p>{me.specialistProfile.displayName}</p>
+                              <p className="settings-muted">/{me.specialistProfile.slug}</p>
+                            </IonLabel>
+                          </IonItem>
+                          <IonItem lines="none" className="settings-item settings-item--field">
+                            <IonTextarea
+                              label={t('settings.publicBio')}
+                              labelPlacement="stacked"
+                              autoGrow
+                              value={publicBioDraft}
+                              onIonInput={(e) => setPublicBioDraft(String(e.detail.value ?? ''))}
+                              rows={4}
+                            />
+                          </IonItem>
+                          <IonText color="medium" className="ion-padding-start ion-padding-bottom">
+                            <p className="ion-no-margin">{t('settings.publicListingHint')}</p>
+                          </IonText>
+                          <IonItem lines="none" className="settings-item settings-item--field">
+                            <IonInput
+                              label={t('settings.seoTitle')}
+                              labelPlacement="stacked"
+                              value={seoTitleDraft}
+                              onIonInput={(e) => setSeoTitleDraft(String(e.detail.value ?? ''))}
+                            />
+                          </IonItem>
+                        </>
                       ) : null}
                     </IonList>
                     <IonButton

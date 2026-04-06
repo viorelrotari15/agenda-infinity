@@ -38,6 +38,10 @@ model SpecialistProfile {
   displayName  String
   slug         String   @unique
   timezone     String   @default("UTC")
+  /// Public listing / SEO body copy (shown on /p/:slug and in meta description)
+  publicBio    String?
+  /// Optional override for HTML page title; default is displayName + site name
+  seoTitle     String?
   /// YYYY-MM-DD in specialist timezone; last day we sent the morning digest
   morningDigestSentForLocalDate String?
   user         User     @relation(fields: [userId], references: [id])

@@ -69,6 +69,9 @@ async function main() {
       displayName: 'Dr. Iona Martin',
       slug,
       timezone: 'Europe/Bucharest',
+      publicBio:
+        'Licensed physiotherapist offering massage therapy, rehabilitation, and treatment planning. Book online for flexible appointment times.',
+      seoTitle: 'Dr. Iona Martin — Physiotherapy & massage',
     },
   });
 

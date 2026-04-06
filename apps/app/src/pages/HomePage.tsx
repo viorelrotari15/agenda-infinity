@@ -7,6 +7,7 @@ import type { BookingFormValues } from '../components/home/bookingTypes';
 import { CalendarTabView } from '../components/home/CalendarTabView';
 import { HomeViewSegment } from '../components/home/HomeViewSegment';
 import { SpecialistTabView } from '../components/home/SpecialistTabView';
+import { useIsMobileBreakpoint } from '../hooks/useIsMobileBreakpoint';
 import { useCreateBookingMutation } from '../hooks/queries/useCreateBookingMutation';
 import { useBannersQuery } from '../hooks/queries/useBannersQuery';
 import { useMeQuery } from '../hooks/queries/useMeQuery';
@@ -16,18 +17,20 @@ import { hasStoredAccessToken } from '../lib/auth-session';
 import { agendaKeys } from '../lib/query-keys';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import type { BannerPublic } from '@agenda/shared';
 import { getLocaleTag } from '../i18n/i18n';
 import { useAppToast } from '../lib/appToast';
 
 export default function HomePage() {
   const { t } = useTranslation();
+  const location = useLocation();
   const { presentSuccess } = useAppToast();
   const [specialistId, setSpecialistId] = useState('');
   const [selectedService, setSelectedService] = useState('');
   const [selectedSlot, setSelectedSlot] = useState('');
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const isMobileViewport = useIsMobileBreakpoint();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [occupiedSlots, setOccupiedSlots] = useState<Array<{ start: string; end: string }>>([]);
   const [serverOccupiedSlots, setServerOccupiedSlots] = useState<
@@ -71,17 +74,18 @@ export default function HomePage() {
   const [bookingCalendarFillHeight, setBookingCalendarFillHeight] = useState<number | null>(null);
 
   useEffect(() => {
-    setIsMobileViewport(window.matchMedia('(max-width: 767px)').matches);
-    const media = window.matchMedia('(max-width: 767px)');
-    const listener = (e: MediaQueryListEvent) => setIsMobileViewport(e.matches);
-    media.addEventListener('change', listener);
-    return () => media.removeEventListener('change', listener);
-  }, []);
-
-  useEffect(() => {
-    if (!specialists.length || specialistId) return;
-    setSpecialistId(specialists[0].id);
-  }, [specialists, specialistId]);
+    if (!specialists.length) return;
+    const params = new URLSearchParams(location.search);
+    const slug = params.get('specialistSlug');
+    if (slug) {
+      const match = specialists.find((s) => s.slug === slug);
+      if (match) {
+        setSpecialistId(match.id);
+        return;
+      }
+    }
+    setSpecialistId((prev) => prev || specialists[0].id);
+  }, [specialists, location.search]);
 
   useEffect(() => {
     if (!services.length) return;

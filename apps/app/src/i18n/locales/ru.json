@@ -119,7 +119,10 @@
     "phone": "Телефон",
     "role": "Роль",
     "publicProfile": "Публичный профиль",
-    "savePhone": "Сохранить телефон",
+    "publicBio": "Текст для публичной страницы",
+    "seoTitle": "Заголовок страницы (необязательно)",
+    "publicListingHint": "Показывается на публичной странице (/p/slug) и в поиске.",
+    "savePhone": "Сохранить изменения",
     "platformTitle": "Платформа",
     "platformBody": "Управляйте специалистами, типами услуг, баннерами и расписанием во вкладке Админ.",
     "goAdmin": "Открыть админку",
@@ -246,7 +249,9 @@
     "servicesFor": "Услуги для {{name}}",
     "serviceTypeOptional": "Тип услуги (необязательно)",
     "custom": "Свой",
-    "createService": "Создать услугу"
+    "createService": "Создать услугу",
+    "publicListingSeo": "Публичная страница (SEO)",
+    "savePublicListing": "Сохранить описание"
   },
   "sessionDetail": {
     "back": "Расписание",

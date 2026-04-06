@@ -5,3 +5,22 @@ node_modules
 **/.turbo
 **/node_modules
 
+# CI / local artifacts
+playwright-report
+test-results
+coverage
+**/.vitest
+
+# Not needed for image build
+e2e
+docs
+perf
+/scripts
+**/*.md
+.gitignore
+.prettierignore
+.editorconfig
+
+# Mobile shells (Vite build does not need native projects)
+**/android
+**/ios

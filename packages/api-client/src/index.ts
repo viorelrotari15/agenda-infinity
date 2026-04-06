@@ -175,7 +175,12 @@ export class AgendaApiClient {
     return this.request('GET', '/auth/me');
   }
 
-  patchProfile(body: { phone?: string; fcmToken?: string | null }): Promise<MeUser> {
+  patchProfile(body: {
+    phone?: string;
+    fcmToken?: string | null;
+    publicBio?: string | null;
+    seoTitle?: string | null;
+  }): Promise<MeUser> {
     return this.request('PATCH', '/auth/profile', body);
   }
 
@@ -215,10 +220,26 @@ export class AgendaApiClient {
       displayName: string;
       slug: string;
       timezone: string;
+      publicBio: string | null;
+      seoTitle: string | null;
       user: { id: string; email: string; phone: string | null };
     }>
   > {
     return this.request('GET', '/admin/specialists');
+  }
+
+  adminPatchSpecialistPublicProfile(
+    specialistId: string,
+    body: { publicBio?: string | null; seoTitle?: string | null },
+  ): Promise<{
+    id: string;
+    displayName: string;
+    slug: string;
+    timezone: string;
+    publicBio: string | null;
+    seoTitle: string | null;
+  }> {
+    return this.request('PATCH', `/admin/specialists/${specialistId}/public-profile`, body);
   }
 
   adminSetWorkingHours(

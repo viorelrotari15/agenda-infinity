@@ -37,6 +37,7 @@ services:
       JWT_SECRET: change-me
       PORT: 3001
       REDIS_URL: redis://redis:6379
+      PUBLIC_APP_ORIGIN: http://localhost:5173
     ports:
       - '3001:3001'
     healthcheck:

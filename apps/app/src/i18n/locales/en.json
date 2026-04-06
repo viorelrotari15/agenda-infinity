@@ -119,7 +119,10 @@
     "phone": "Phone",
     "role": "Role",
     "publicProfile": "Public profile",
-    "savePhone": "Save phone",
+    "publicBio": "Public listing text",
+    "seoTitle": "Page title override (optional)",
+    "publicListingHint": "Shown on your public page (/p/your-slug) and in search results.",
+    "savePhone": "Save changes",
     "platformTitle": "Platform",
     "platformBody": "Manage every specialist, service type, banner, and schedule from the Admin tab.",
     "goAdmin": "Go to Admin",
@@ -246,7 +249,9 @@
     "servicesFor": "Services for {{name}}",
     "serviceTypeOptional": "Service type (optional)",
     "custom": "Custom",
-    "createService": "Create service"
+    "createService": "Create service",
+    "publicListingSeo": "Public listing (SEO)",
+    "savePublicListing": "Save public listing"
   },
   "sessionDetail": {
     "back": "Agenda",

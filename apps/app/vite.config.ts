@@ -10,6 +10,23 @@ export default defineConfig({
         target: 'http://localhost:3001',
         changeOrigin: true,
       },
+      /** Specialist SEO HTML is served by Nest (same as production reverse proxy). */
+      '/p': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+    },
+  },
+  preview: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+      '/p': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
     },
   },
   test: {

@@ -21,6 +21,8 @@ export const SpecialistPublicSchema = z.object({
   slug: z.string(),
   displayName: z.string(),
   timezone: z.string(),
+  publicBio: z.string().nullable().optional(),
+  seoTitle: z.string().nullable().optional(),
 });
 export type SpecialistPublic = z.infer<typeof SpecialistPublicSchema>;
 
@@ -89,6 +91,8 @@ export const SpecialistProfileMeSchema = z.object({
   displayName: z.string(),
   slug: z.string(),
   timezone: z.string(),
+  publicBio: z.string().nullable().optional(),
+  seoTitle: z.string().nullable().optional(),
 });
 export type SpecialistProfileMe = z.infer<typeof SpecialistProfileMeSchema>;
 

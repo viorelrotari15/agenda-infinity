@@ -119,7 +119,10 @@
     "phone": "Telefon",
     "role": "Rol",
     "publicProfile": "Profil public",
-    "savePhone": "Salvează telefonul",
+    "publicBio": "Text listare publică",
+    "seoTitle": "Titlu pagină (opțional)",
+    "publicListingHint": "Afișat pe pagina publică (/p/slug) și în rezultatele de căutare.",
+    "savePhone": "Salvează modificările",
     "platformTitle": "Platformă",
     "platformBody": "Gestionați specialiștii, tipurile de servicii, bannerele și programul din fila Admin.",
     "goAdmin": "Deschide Admin",
@@ -246,7 +249,9 @@
     "servicesFor": "Servicii pentru {{name}}",
     "serviceTypeOptional": "Tip serviciu (opțional)",
     "custom": "Personalizat",
-    "createService": "Creează serviciu"
+    "createService": "Creează serviciu",
+    "publicListingSeo": "Listare publică (SEO)",
+    "savePublicListing": "Salvează listarea publică"
   },
   "sessionDetail": {
     "back": "Agendă",

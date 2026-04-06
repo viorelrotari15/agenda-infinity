@@ -382,6 +382,34 @@ ion-content.app-content {
   box-shadow: 0 0 0 4px rgba(var(--ion-color-primary-rgb), 0.12);
 }
 
+/* Calendar tab — service picker (ion-select), mirrors glass native select */
+.calendar-tab-service-field {
+  --background: transparent;
+  --inner-border-width: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+  margin: 0 -8px;
+}
+
+ion-select.calendar-tab-service-select {
+  width: 100%;
+  max-width: 100%;
+  --background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  --border-radius: var(--ui-radius-sm);
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: rgba(0, 0, 0, 0.06);
+  --padding-top: 13px;
+  --padding-bottom: 13px;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  font-size: 1rem;
+  color: var(--theme-text);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset;
+}
+
 /* Pill segmented control — soft lavender track + sky-blue active pill */
 ion-segment.pill-segmented-control {
   --background: var(--theme-pill-track);
@@ -598,6 +626,20 @@ ion-segment.pill-segmented-control ion-segment-button::part(native) {
 ion-modal.booking-modal-mobile::part(backdrop) {
   backdrop-filter: blur(18px) saturate(160%);
   -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+
+/* ion-select `interface="modal"` — full-screen option list on narrow viewports */
+ion-modal.app-select-modal {
+  --width: 100%;
+  --height: 100%;
+  --max-width: 100%;
+  --border-radius: 0;
+  --backdrop-opacity: 0.45;
+}
+
+ion-modal.app-select-modal::part(backdrop) {
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
 }
 
 /* Specialist + carousels — mobile first */

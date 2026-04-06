@@ -7,6 +7,7 @@ import {
   Get,
   Headers,
   Param,
+  Patch,
   Post,
   Put,
 } from '@nestjs/common';
@@ -113,6 +114,55 @@ export class AdminController {
         user: { select: { id: true, email: true, phone: true } },
       },
       orderBy: { displayName: 'asc' },
+    });
+  }
+
+  @Patch('specialists/:specialistId/public-profile')
+  async patchSpecialistPublicProfile(
+    @Headers('authorization') authorization: string | undefined,
+    @Param('specialistId') specialistId: string,
+    @Body() body: { publicBio?: string | null; seoTitle?: string | null },
+  ) {
+    await this.requireAdmin(authorization);
+    const specialist = await this.prisma.specialistProfile.findUnique({
+      where: { id: specialistId },
+    });
+    if (!specialist) throw new BadRequestException(apiT('specialist_not_found'));
+    const data: { publicBio?: string | null; seoTitle?: string | null } = {};
+    if (body.publicBio !== undefined) {
+      const t = typeof body.publicBio === 'string' ? body.publicBio.trim() : '';
+      if (t.length > 8000) throw new BadRequestException(apiT('public_bio_too_long'));
+      data.publicBio = t.length ? t : null;
+    }
+    if (body.seoTitle !== undefined) {
+      const t = typeof body.seoTitle === 'string' ? body.seoTitle.trim() : '';
+      if (t.length > 200) throw new BadRequestException(apiT('seo_title_too_long'));
+      data.seoTitle = t.length ? t : null;
+    }
+    if (!Object.keys(data).length) {
+      return this.prisma.specialistProfile.findUniqueOrThrow({
+        where: { id: specialistId },
+        select: {
+          id: true,
+          displayName: true,
+          slug: true,
+          timezone: true,
+          publicBio: true,
+          seoTitle: true,
+        },
+      });
+    }
+    return this.prisma.specialistProfile.update({
+      where: { id: specialistId },
+      data,
+      select: {
+        id: true,
+        displayName: true,
+        slug: true,
+        timezone: true,
+        publicBio: true,
+        seoTitle: true,
+      },
     });
   }
 

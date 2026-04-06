@@ -1,10 +1,15 @@
 import { lazy, Suspense, type ReactNode, type RefObject } from 'react';
 import type { ServiceDto } from '@agenda/shared';
 import { useTranslation } from 'react-i18next';
+import { useSelectModalInterface } from '../../hooks/useIsMobileBreakpoint';
 import {
   IonContent,
   IonHeader,
+  IonItem,
+  IonLabel,
   IonModal,
+  IonSelect,
+  IonSelectOption,
   IonSpinner,
   IonText,
   IonTitle,
@@ -61,6 +66,7 @@ export function CalendarTabView({
   bookingFormModalContent,
 }: Props) {
   const { t } = useTranslation();
+  const selectModal = useSelectModalInterface();
   return (
     <>
       <div className="home-section-stack">
@@ -92,25 +98,33 @@ export function CalendarTabView({
             <CardTitle>{t('calendarTab.chooseService')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <label className="ui-label" htmlFor="calendar-service-select">
-              {t('calendarTab.serviceLabel')}
-            </label>
-            <select
-              id="calendar-service-select"
-              value={selectedService}
-              onChange={(e) => onSelectedServiceChange(e.target.value)}
-              className="glass-field-select"
-            >
-              <option value="">{t('calendarTab.selectServiceOption')}</option>
-              {services.map((service) => (
-                <option key={service.id} value={service.id}>
-                  {t('calendarTab.serviceOption', {
-                    name: service.name,
-                    minutes: service.durationMinutes,
-                  })}
-                </option>
-              ))}
-            </select>
+            <IonItem lines="none" className="calendar-tab-service-field">
+              <IonLabel position="stacked" className="ui-label">
+                {t('calendarTab.serviceLabel')}
+              </IonLabel>
+              <IonSelect
+                key={selectModal ? 'if-modal' : 'if-popover'}
+                interface={selectModal ? 'modal' : 'popover'}
+                interfaceOptions={
+                  selectModal
+                    ? { header: t('calendarTab.chooseService'), cssClass: 'app-select-modal' }
+                    : undefined
+                }
+                className="calendar-tab-service-select"
+                value={selectedService}
+                onIonChange={(e) => onSelectedServiceChange(String(e.detail.value ?? ''))}
+              >
+                <IonSelectOption value="">{t('calendarTab.selectServiceOption')}</IonSelectOption>
+                {services.map((service) => (
+                  <IonSelectOption key={service.id} value={service.id}>
+                    {t('calendarTab.serviceOption', {
+                      name: service.name,
+                      minutes: service.durationMinutes,
+                    })}
+                  </IonSelectOption>
+                ))}
+              </IonSelect>
+            </IonItem>
           </CardContent>
         </Card>
 
