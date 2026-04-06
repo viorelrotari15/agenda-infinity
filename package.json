@@ -13,6 +13,10 @@
     "lint:eslint:fix": "eslint --fix .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "test": "turbo run test",
+    "test:coverage": "turbo run test:coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "db:generate": "pnpm --filter @agenda/api exec prisma generate",
     "db:migrate": "pnpm --filter @agenda/api exec prisma migrate dev",
     "db:push": "pnpm --filter @agenda/api exec prisma db push",
@@ -22,6 +26,7 @@
     "docker:up:detached": "docker compose up --build -d"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.1",
     "@eslint/js": "^9.39.4",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",

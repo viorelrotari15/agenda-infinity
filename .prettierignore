@@ -9,3 +9,6 @@ apps/app/ios
 **/prisma/migrations
 apps-mobile
 mobile
+playwright-report
+test-results
+e2e

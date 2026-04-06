@@ -13,3 +13,5 @@ coverage
 apps/app/android
 apps/app/ios
 apps/app/.capacitor
+playwright-report
+test-results

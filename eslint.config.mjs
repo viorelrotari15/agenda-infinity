@@ -18,6 +18,10 @@ export default tseslint.config(
       'apps/app/ios/**',
       'apps-mobile/**',
       'mobile/**',
+      'e2e/**',
+      'playwright.config.ts',
+      '**/vitest.config.ts',
+      'apps/api/jest.config.cjs',
     ],
   },
   eslint.configs.recommended,
@@ -65,6 +69,21 @@ export default tseslint.config(
     files: ['packages/**/*.ts'],
     languageOptions: {
       globals: { ...globals.node },
+    },
+  },
+  {
+    files: ['apps/api/**/*.spec.ts'],
+    languageOptions: {
+      globals: { ...globals.node, ...globals.jest },
+    },
+  },
+  {
+    files: [
+      'packages/**/*.test.ts',
+      'apps/app/src/**/*.{test,spec}.{ts,tsx}',
+    ],
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.vitest },
     },
   },
   eslintConfigPrettier,
