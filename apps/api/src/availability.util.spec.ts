@@ -27,7 +27,12 @@ describe('computeSlots', () => {
       to,
       durationMinutes: 30,
       bufferMinutes: 0,
-      booked: [{ startUtc: new Date('2026-04-05T09:15:00.000Z'), endUtc: new Date('2026-04-05T09:45:00.000Z') }],
+      booked: [
+        {
+          startUtc: new Date('2026-04-05T09:15:00.000Z'),
+          endUtc: new Date('2026-04-05T09:45:00.000Z'),
+        },
+      ],
     });
     const starts = slots.map((s) => s.start);
     expect(starts).not.toContain('2026-04-05T09:00:00.000Z');

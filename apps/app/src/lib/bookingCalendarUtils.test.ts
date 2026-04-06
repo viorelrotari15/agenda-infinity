@@ -20,9 +20,7 @@ describe('slotTimeRange', () => {
 });
 
 describe('isWithinWorkingHours', () => {
-  const monday = [
-    { dayOfWeek: 1, startLocal: '09:00', endLocal: '17:00' },
-  ];
+  const monday = [{ dayOfWeek: 1, startLocal: '09:00', endLocal: '17:00' }];
 
   it('returns false when there are no rules', () => {
     const start = new Date('2026-04-06T10:00:00');

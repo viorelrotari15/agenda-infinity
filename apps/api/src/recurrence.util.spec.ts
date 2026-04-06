@@ -14,7 +14,11 @@ describe('expandRecurrence', () => {
   it('returns empty when the window does not intersect rule occurrences', () => {
     const from = new Date(Date.UTC(2030, 5, 1, 0, 0, 0));
     const to = new Date(Date.UTC(2030, 5, 2, 0, 0, 0));
-    const dates = expandRecurrence('FREQ=YEARLY;BYMONTH=1;BYMONTHDAY=1;COUNT=10;DTSTART=20200101T000000Z', from, to);
+    const dates = expandRecurrence(
+      'FREQ=YEARLY;BYMONTH=1;BYMONTHDAY=1;COUNT=10;DTSTART=20200101T000000Z',
+      from,
+      to,
+    );
     expect(dates).toEqual([]);
   });
 });

@@ -21,9 +21,7 @@ describe('AgendaApiClient', () => {
   it('returns parsed JSON on 200', async () => {
     nock(BASE)
       .get('/specialists')
-      .reply(200, [
-        { id: '1', slug: 'a', displayName: 'A', timezone: 'UTC' },
-      ]);
+      .reply(200, [{ id: '1', slug: 'a', displayName: 'A', timezone: 'UTC' }]);
 
     const client = new AgendaApiClient(BASE);
     const list = await client.listSpecialists();
@@ -43,14 +41,11 @@ describe('AgendaApiClient', () => {
   });
 
   it('sends Authorization when token getter returns a value', async () => {
-    nock(BASE)
-      .matchHeader('authorization', 'Bearer tok')
-      .get('/auth/me')
-      .reply(200, {
-        id: 'u',
-        email: 'e@e.e',
-        role: 'CLIENT',
-      });
+    nock(BASE).matchHeader('authorization', 'Bearer tok').get('/auth/me').reply(200, {
+      id: 'u',
+      email: 'e@e.e',
+      role: 'CLIENT',
+    });
 
     const client = new AgendaApiClient(BASE, () => 'tok');
     const me = await client.me();

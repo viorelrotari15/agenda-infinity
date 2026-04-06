@@ -14,13 +14,7 @@ module.exports = {
       },
     ],
   },
-  collectCoverageFrom: [
-    '**/*.(t|j)s',
-    '!**/*.spec.ts',
-    '!**/*.module.ts',
-    '!main.ts',
-    '!seed.ts',
-  ],
+  collectCoverageFrom: ['**/*.(t|j)s', '!**/*.spec.ts', '!**/*.module.ts', '!main.ts', '!seed.ts'],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
 };

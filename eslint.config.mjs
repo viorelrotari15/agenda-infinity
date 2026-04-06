@@ -78,10 +78,7 @@ export default tseslint.config(
     },
   },
   {
-    files: [
-      'packages/**/*.test.ts',
-      'apps/app/src/**/*.{test,spec}.{ts,tsx}',
-    ],
+    files: ['packages/**/*.test.ts', 'apps/app/src/**/*.{test,spec}.{ts,tsx}'],
     languageOptions: {
       globals: { ...globals.browser, ...globals.vitest },
     },
