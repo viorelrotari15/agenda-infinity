@@ -24,6 +24,8 @@
     "db:seed": "node scripts/docker-api-run.cjs pnpm --filter @agenda/api run seed",
     "api:docker": "docker compose up --build api",
     "docker:up": "docker compose up --build",
+    "docker:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build",
+    "docker:dev:detached": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build -d",
     "docker:up:detached": "docker compose up --build -d",
     "docker:up:app": "docker compose up -d --build --force-recreate api web && docker compose ps -a",
     "perf:stress": "node perf/autocannon-stress.mjs",

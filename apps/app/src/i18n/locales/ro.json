@@ -2,23 +2,87 @@
   "app": {
     "title": "Agenda Infinity",
     "account": "Cont",
-    "signIn": "Autentificare"
+    "signIn": "Autentificare",
+    "back": "Înapoi"
   },
   "tabs": {
+    "home": "Acasă",
+    "discover": "Descoperă",
     "book": "Rezervare",
     "agenda": "Agendă",
     "settings": "Setări",
-    "admin": "Admin"
+    "admin": "Admin",
+    "myPage": "Pagina ta",
+    "availability": "Disponibilitate"
+  },
+  "specialistMyPage": {
+    "heroTitle": "Pagina ta publică",
+    "heroSub": "Cum te văd clienții în catalog.",
+    "noBio": "Încă nu există descriere publică — adaugă una în Setări.",
+    "editInSettings": "Editează profilul în Setări",
+    "media": {
+      "profilePhoto": "Fotografie de profil",
+      "changePhoto": "Schimbă fotografia",
+      "photoHint": "Apare în catalog. Imaginile sunt optimizate în WebP pentru a reduce traficul.",
+      "galleryTitle": "Galerie",
+      "addGallery": "Adaugă imagine",
+      "removeImage": "Elimină imaginea",
+      "noGallery": "Încă nu există imagini în galerie.",
+      "uploadOk": "Salvat.",
+      "uploadFail": "Nu s-a putut încărca imaginea.",
+      "storageUnavailable": "Stocarea imaginilor nu este configurată pe acest server.",
+      "removed": "Imagine eliminată."
+    }
+  },
+  "specialistAvailability": {
+    "heroTitle": "Disponibilitate",
+    "heroSub": "Program de lucru și servicii rezervabile."
+  },
+  "directory": {
+    "title": "Descoperă",
+    "intro": "Răsfoiți specialiștii pe categorii, comparați evaluările și rezervați rapid.",
+    "sort": {
+      "recommended": "Pentru tine",
+      "rating": "Evaluare",
+      "name": "Nume"
+    },
+    "hintInterests": "Ordinea folosește interesele din Setări când alegeți „Pentru tine”.",
+    "hintGuest": "„Pentru tine” favorizează specialiștii deschiși recent pe acest dispozitiv.",
+    "allCategories": "Toate",
+    "yourCategories": "Categoriile tale din catalog",
+    "categoryWithCount": "{{name}} ({{count}})",
+    "sampleServices": "Servicii:",
+    "bookCta": "Rezervă",
+    "reviewCount": "{{count}} recenzii",
+    "loadError": "Nu s-au putut încărca specialiștii.",
+    "empty": "Niciun specialist nu corespunde filtrului.",
+    "searchPlaceholder": "Căutare inteligentă — nume, serviciu, categorie…",
+    "searchNoResults": "Niciun specialist nu corespunde căutării. Încercați alte cuvinte sau goliți câmpul.",
+    "createAccount": "Creează cont"
   },
   "home": {
     "title": "Rezervare",
+    "backToDiscover": "Descoperă",
     "viewSpecialist": "Specialist",
     "viewCalendar": "Calendar",
     "bookingConflict": "Acest interval este deja ocupat. Alegeți altă oră.",
     "bookingFailed": "Nu s-a putut confirma rezervarea. Reîmprospătați și încercați alt interval.",
     "bookingConfirmed": "Rezervare confirmată",
     "createSpecialistFirst": "Creați mai întâi un cont de specialist pentru a încărca disponibilitatea pe servicii.",
-    "loadingSpecialists": "Se încarcă specialiștii…"
+    "loadingSpecialists": "Se încarcă specialiștii…",
+    "directoryCategories": "Categorii",
+    "directoryCategoriesAria": "Categoriile în care este listat acest specialist",
+    "availablePeriods": {
+      "title": "Următoarele intervale libere",
+      "subtitle": "Cele mai apropiate sloturi pentru serviciul ales. Atinge un rând pentru a continua în calendar.",
+      "serviceLabel": "Serviciu pentru această listă",
+      "serviceOption": "{{name}} ({{minutes}} min)",
+      "loading": "Se încarcă intervalele…",
+      "empty": "Nu există intervale libere în următoarele două săptămâni pentru acest serviciu. Încercați alt serviciu sau alegeți o zi în calendar.",
+      "loadError": "Nu s-a putut încărca disponibilitatea.",
+      "pickSlot": "Rezervă acest timp",
+      "ariaLabel": "Timpuri disponibile pentru rezervare"
+    }
   },
   "bookingForm": {
     "title": "Detalii rezervare",
@@ -126,7 +190,10 @@
     "platformTitle": "Platformă",
     "platformBody": "Gestionați specialiștii, tipurile de servicii, bannerele și programul din fila Admin.",
     "goAdmin": "Deschide Admin",
-    "clientHint": "Rezervați din fila Rezervare. Programările viitoare sunt în Agendă.",
+    "clientHint": "Descoperiți specialiști pe Acasă și rezervați de pe pagina lor. Vizitele apar în Agendă când deschideți dintr-o rezervare.",
+    "interestsTitle": "Interesele tale",
+    "interestsHint": "Folosite pentru personalizarea filei Descoperă (sortare „Pentru tine”).",
+    "interestsSave": "Salvează interesele",
     "signOut": "Deconectare",
     "workingHours": "Program de lucru",
     "workingHoursHint": "Intervale locale în care clienții pot rezerva.",
@@ -188,7 +255,8 @@
     "pickTimeHint": "Atingeți cronologia pentru un slot de 30 de minute.",
     "booked": "Rezervat",
     "yourSelection": "Selecția dvs.",
-    "chooseTimeline": "Alegeți ora de început — atingeți unde doriți să rezervați"
+    "chooseTimeline": "Alegeți ora de început — atingeți unde doriți să rezervați",
+    "availableSlotsCount": "{{count}} sloturi disponibile"
   },
   "bookingStatus": {
     "CREATED": {
@@ -210,8 +278,29 @@
       "blocks": "Blocări",
       "types": "Tipuri",
       "banners": "Bannere",
-      "services": "Servicii"
+      "services": "Servicii",
+      "categories": "Categorii",
+      "reviews": "Recenzii"
     },
+    "categoriesTitle": "Categorii",
+    "categorySlug": "Slug",
+    "categoryNameEn": "Nume (EN)",
+    "categoryNameRo": "Nume (RO)",
+    "categoryNameRu": "Nume (RU)",
+    "addCategory": "Adaugă categorie",
+    "categorySpecialistCount": "{{count}} specialiști în această categorie",
+    "saveCategory": "Salvează",
+    "specialistCategoriesTitle": "Categorii specialist",
+    "assignCategoriesHint": "Selectați categoriile pentru specialistul ales.",
+    "saveSpecialistCategories": "Salvează categoriile",
+    "reviewsTitle": "Recenzii",
+    "reviewSpecialist": "Specialist",
+    "reviewAuthor": "Autor",
+    "reviewRating": "Evaluare",
+    "reviewStatus": "Stare",
+    "reviewComment": "Comentariu",
+    "approveReview": "Aprobă",
+    "rejectReview": "Respinge",
     "directory": "Director",
     "createUser": "Creare utilizator",
     "role": "Rol",
@@ -257,8 +346,10 @@
     "back": "Agendă",
     "title": "Ședință",
     "specialistRequired": "Este necesară autentificarea ca specialist pentru această ședință.",
+    "agendaBookingRoleHint": "Autentifică-te ca client sau specialist pentru a vedea această rezervare.",
     "loadError": "Nu s-a putut încărca rezervarea.",
     "when": "Când",
+    "specialist": "Specialist",
     "client": "Client",
     "noPhone": "Fără telefon în dosar",
     "accept": "Acceptă",

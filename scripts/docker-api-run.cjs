@@ -22,15 +22,7 @@ if (argv.length === 0) {
   process.exit(1);
 }
 
-const dockerArgs = [
-  'compose',
-  'run',
-  '--rm',
-  '-v',
-  `${root}:/workspace`,
-  '-w',
-  '/workspace',
-];
+const dockerArgs = ['compose', 'run', '--rm', '-v', `${root}:/workspace`, '-w', '/workspace'];
 
 if (useIt) {
   dockerArgs.push('-it');
@@ -43,4 +35,4 @@ const r = spawnSync('docker', dockerArgs, {
   shell: process.platform === 'win32',
 });
 
-process.exit(r.status === 0 ? 0 : r.status ?? 1);
+process.exit(r.status === 0 ? 0 : (r.status ?? 1));

@@ -2,17 +2,23 @@
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
+/** In Docker, the Vite dev server must proxy to the `api` service, not `localhost`. */
+const proxyTarget = process.env.VITE_PROXY_API_TARGET ?? 'http://localhost:3001';
+const usePolling = process.env.VITE_USE_POLLING === 'true';
+
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: true,
+    watch: usePolling ? { usePolling: true } : undefined,
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: proxyTarget,
         changeOrigin: true,
       },
       /** Specialist SEO HTML is served by Nest (same as production reverse proxy). */
       '/p': {
-        target: 'http://localhost:3001',
+        target: proxyTarget,
         changeOrigin: true,
       },
     },
@@ -20,11 +26,11 @@ export default defineConfig({
   preview: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: proxyTarget,
         changeOrigin: true,
       },
       '/p': {
-        target: 'http://localhost:3001',
+        target: proxyTarget,
         changeOrigin: true,
       },
     },

@@ -20,6 +20,12 @@ enum BookingStatus {
   CANCELLED
 }
 
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -30,6 +36,9 @@ model User {
   createdAt DateTime @default(now())
   specialist SpecialistProfile?
   bookings  Booking[] @relation("ClientBookings")
+  clientProfile ClientProfile?
+  interests     ClientInterest[]
+  reviewsAuthored Review[]
 }
 
 model SpecialistProfile {
@@ -44,11 +53,88 @@ model SpecialistProfile {
   seoTitle     String?
   /// YYYY-MM-DD in specialist timezone; last day we sent the morning digest
   morningDigestSentForLocalDate String?
+  /// Denormalized from approved reviews (updated when reviews change)
+  averageRating Float    @default(0)
+  reviewCount   Int      @default(0)
+  /// Public profile photo (HTTPS URL); shown in directory and public pages
+  publicPhotoUrl String?
+  galleryImages  SpecialistGalleryImage[]
   user         User     @relation(fields: [userId], references: [id])
   services     Service[]
   workingHours WorkingHoursRule[]
   availabilityBlocks AvailabilityBlock[]
   bookings     Booking[]
+  categories   SpecialistCategory[]
+  reviews      Review[]
+}
+
+/// Portfolio images for specialist profile (stored in object storage; URLs are public-read).
+model SpecialistGalleryImage {
+  id             String   @id @default(cuid())
+  specialistId   String
+  objectKey      String
+  publicUrl      String
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  specialist     SpecialistProfile @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+
+  @@index([specialistId, sortOrder])
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  nameEn    String
+  nameRo    String
+  nameRu    String
+  sortOrder Int      @default(0)
+  active    Boolean  @default(true)
+  specialists SpecialistCategory[]
+  interests   ClientInterest[]
+}
+
+model SpecialistCategory {
+  specialistId String
+  categoryId   String
+  isPrimary    Boolean @default(false)
+  specialist   SpecialistProfile @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+  category     Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([specialistId, categoryId])
+  @@index([categoryId])
+}
+
+model ClientProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ClientInterest {
+  userId     String
+  categoryId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([userId, categoryId])
+  @@index([categoryId])
+}
+
+model Review {
+  id             String       @id @default(cuid())
+  specialistId   String
+  authorUserId   String
+  rating         Int
+  comment        String       @db.VarChar(2000)
+  status         ReviewStatus @default(PENDING)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  specialist     SpecialistProfile @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+  author         User              @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
+
+  @@unique([specialistId, authorUserId])
+  @@index([specialistId, status])
+  @@index([status])
 }
 
 model AvailabilityBlock {

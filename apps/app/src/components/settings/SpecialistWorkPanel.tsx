@@ -1,0 +1,201 @@
+import { IonButton, IonInput, IonItem, IonLabel, IonList, IonToggle } from '@ionic/react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { api } from '../../lib/api';
+import { hasStoredAccessToken } from '../../lib/auth-session';
+import { useMeQuery } from '../../hooks/queries/useMeQuery';
+import { agendaKeys } from '../../lib/query-keys';
+import type { WorkingHoursRule } from '@agenda/shared';
+
+export function SpecialistWorkPanel() {
+  const { t } = useTranslation();
+  const daysShort = t('daysShort', { returnObjects: true }) as string[];
+  const queryClient = useQueryClient();
+  const meQuery = useMeQuery(hasStoredAccessToken());
+  const me = meQuery.data;
+
+  const whQuery = useQuery({
+    queryKey: [...agendaKeys.all, 'my-wh'],
+    queryFn: () => api.getWorkingHours(),
+    enabled: me?.role === 'SPECIALIST',
+  });
+
+  const [rules, setRules] = useState<WorkingHoursRule[]>([]);
+  useEffect(() => {
+    const data = whQuery.data;
+    if (!data?.length && me?.role === 'SPECIALIST') {
+      setRules(
+        [1, 2, 3, 4, 5].map((d) => ({ dayOfWeek: d, startLocal: '09:00', endLocal: '17:00' })),
+      );
+      return;
+    }
+    if (data?.length) setRules(data.map((r) => ({ ...r })));
+  }, [whQuery.data, me?.role]);
+
+  const saveWhMutation = useMutation({
+    mutationFn: () => api.setWorkingHours(rules),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...agendaKeys.all, 'my-wh'] });
+      queryClient.invalidateQueries({ queryKey: agendaKeys.specialists() });
+      const sid = me?.specialistProfile?.id;
+      if (sid) {
+        queryClient.invalidateQueries({ queryKey: agendaKeys.specialistWorkingHours(sid) });
+      }
+    },
+  });
+
+  const servicesQuery = useQuery({
+    queryKey: agendaKeys.myServices(),
+    queryFn: () => api.listMyServices(),
+    enabled: me?.role === 'SPECIALIST',
+  });
+
+  const [newSvc, setNewSvc] = useState({ name: '', durationMinutes: 30, bufferMinutes: 0 });
+
+  const createSvcMutation = useMutation({
+    mutationFn: () =>
+      api.createService({
+        name: newSvc.name.trim(),
+        durationMinutes: newSvc.durationMinutes,
+        bufferMinutes: newSvc.bufferMinutes,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: agendaKeys.myServices() });
+      if (me?.specialistProfile?.id) {
+        queryClient.invalidateQueries({
+          queryKey: agendaKeys.specialistServices(me.specialistProfile.id),
+        });
+      }
+      setNewSvc({ name: '', durationMinutes: 30, bufferMinutes: 0 });
+    },
+  });
+
+  const toggleSvcMutation = useMutation({
+    mutationFn: (p: { id: string; active: boolean }) =>
+      api.patchSpecialistService(p.id, { active: p.active }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: agendaKeys.myServices() });
+      if (me?.specialistProfile?.id) {
+        queryClient.invalidateQueries({
+          queryKey: agendaKeys.specialistServices(me.specialistProfile.id),
+        });
+      }
+    },
+  });
+
+  return (
+    <>
+      <div className="settings-block settings-block--glass">
+        <h2 className="settings-h2">{t('settings.workingHours')}</h2>
+        <p className="settings-hint">{t('settings.workingHoursHint')}</p>
+        <div className="settings-wh-stack">
+          {rules.map((row, idx) => (
+            <IonItem
+              key={`${row.dayOfWeek}-${idx}`}
+              lines="none"
+              className="settings-item settings-wh-row"
+            >
+              <IonLabel className="settings-wh-day">{daysShort[row.dayOfWeek]}</IonLabel>
+              <div className="settings-wh-times" slot="end">
+                <IonInput
+                  className="settings-time-input"
+                  aria-label={`${daysShort[row.dayOfWeek]} start`}
+                  value={row.startLocal}
+                  onIonInput={(e) => {
+                    const v = String(e.detail.value ?? '');
+                    const next = [...rules];
+                    next[idx] = { ...next[idx], startLocal: v };
+                    setRules(next);
+                  }}
+                />
+                <span className="settings-wh-sep" aria-hidden>
+                  –
+                </span>
+                <IonInput
+                  className="settings-time-input"
+                  aria-label={`${daysShort[row.dayOfWeek]} end`}
+                  value={row.endLocal}
+                  onIonInput={(e) => {
+                    const v = String(e.detail.value ?? '');
+                    const next = [...rules];
+                    next[idx] = { ...next[idx], endLocal: v };
+                    setRules(next);
+                  }}
+                />
+              </div>
+            </IonItem>
+          ))}
+        </div>
+        <IonButton
+          expand="block"
+          shape="round"
+          className="settings-cta"
+          onClick={() => saveWhMutation.mutate()}
+          disabled={saveWhMutation.isPending}
+        >
+          {t('settings.saveWorkingHours')}
+        </IonButton>
+      </div>
+
+      <div className="settings-block settings-block--glass">
+        <h2 className="settings-h2">{t('settings.servicesTitle')}</h2>
+        <p className="settings-hint settings-hint--tight">{t('settings.servicesHint')}</p>
+        <IonList lines="none" className="settings-services-list">
+          {(servicesQuery.data ?? []).map((s) => (
+            <IonItem key={s.id} lines="none" className="settings-item settings-service-row">
+              <IonLabel>
+                <h3 className="settings-service-name">{s.name}</h3>
+                <p className="settings-service-meta">
+                  {t('settings.serviceMeta', {
+                    duration: s.durationMinutes,
+                    buffer: s.bufferMinutes,
+                  })}
+                </p>
+              </IonLabel>
+              <IonToggle
+                slot="end"
+                className="settings-service-toggle"
+                checked={s.active}
+                onIonChange={(e) =>
+                  toggleSvcMutation.mutate({ id: s.id, active: e.detail.checked })
+                }
+              />
+            </IonItem>
+          ))}
+        </IonList>
+        <div className="settings-add-service">
+          <IonItem lines="none" className="settings-item settings-item--field">
+            <IonInput
+              label={t('settings.newServiceName')}
+              labelPlacement="stacked"
+              value={newSvc.name}
+              onIonInput={(e) => setNewSvc({ ...newSvc, name: String(e.detail.value ?? '') })}
+            />
+          </IonItem>
+          <IonItem lines="none" className="settings-item settings-item--field">
+            <IonInput
+              label={t('settings.durationMin')}
+              labelPlacement="stacked"
+              type="number"
+              value={String(newSvc.durationMinutes)}
+              onIonInput={(e) =>
+                setNewSvc({ ...newSvc, durationMinutes: Number(e.detail.value ?? 0) })
+              }
+            />
+          </IonItem>
+          <IonButton
+            expand="block"
+            shape="round"
+            className="settings-cta settings-cta--secondary"
+            fill="outline"
+            onClick={() => createSvcMutation.mutate()}
+            disabled={createSvcMutation.isPending || !newSvc.name.trim()}
+          >
+            {t('settings.addService')}
+          </IonButton>
+        </div>
+      </div>
+    </>
+  );
+}

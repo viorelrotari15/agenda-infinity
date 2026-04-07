@@ -69,6 +69,21 @@ export const SpecialistBookingDetailSchema = BookingEventSchema.extend({
 });
 export type SpecialistBookingDetail = z.infer<typeof SpecialistBookingDetailSchema>;
 
+/** Client view of a booking (no other party’s contact fields). */
+export const ClientBookingDetailSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  start: z.string().datetime(),
+  end: z.string().datetime(),
+  status: BookingStatusSchema,
+  serviceName: z.string(),
+  specialistName: z.string(),
+  specialistSlug: z.string(),
+  durationMinutes: z.number(),
+  recurrenceSeriesId: z.string().nullable().optional(),
+});
+export type ClientBookingDetail = z.infer<typeof ClientBookingDetailSchema>;
+
 export const WorkingHoursRuleSchema = z.object({
   dayOfWeek: z.number().min(0).max(6),
   startLocal: z.string(),
@@ -86,6 +101,20 @@ export const BannerPublicSchema = z.object({
 });
 export type BannerPublic = z.infer<typeof BannerPublicSchema>;
 
+export const SpecialistCategoryBadgeSchema = z.object({
+  slug: z.string(),
+  name: z.string(),
+  isPrimary: z.boolean(),
+});
+export type SpecialistCategoryBadge = z.infer<typeof SpecialistCategoryBadgeSchema>;
+
+export const SpecialistGalleryImageMeSchema = z.object({
+  id: z.string(),
+  publicUrl: z.string(),
+  sortOrder: z.number(),
+});
+export type SpecialistGalleryImageMe = z.infer<typeof SpecialistGalleryImageMeSchema>;
+
 export const SpecialistProfileMeSchema = z.object({
   id: z.string(),
   displayName: z.string(),
@@ -93,6 +122,9 @@ export const SpecialistProfileMeSchema = z.object({
   timezone: z.string(),
   publicBio: z.string().nullable().optional(),
   seoTitle: z.string().nullable().optional(),
+  publicPhotoUrl: z.string().nullable().optional(),
+  galleryImages: z.array(SpecialistGalleryImageMeSchema).optional(),
+  categories: z.array(SpecialistCategoryBadgeSchema).optional(),
 });
 export type SpecialistProfileMe = z.infer<typeof SpecialistProfileMeSchema>;
 
@@ -102,5 +134,59 @@ export const MeUserSchema = z.object({
   phone: z.string().nullable().optional(),
   role: RoleSchema,
   specialistProfile: SpecialistProfileMeSchema.nullable().optional(),
+  interestCategoryIds: z.array(z.string()).optional(),
 });
 export type MeUser = z.infer<typeof MeUserSchema>;
+
+export const CategoryPublicSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  name: z.string(),
+  specialistCount: z.number(),
+});
+export type CategoryPublic = z.infer<typeof CategoryPublicSchema>;
+
+export const DirectoryCategoryOnSpecialistSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  name: z.string(),
+  isPrimary: z.boolean(),
+});
+export type DirectoryCategoryOnSpecialist = z.infer<typeof DirectoryCategoryOnSpecialistSchema>;
+
+export const DirectorySampleServiceSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  durationMinutes: z.number(),
+});
+export type DirectorySampleService = z.infer<typeof DirectorySampleServiceSchema>;
+
+export const SpecialistDirectoryEntrySchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  displayName: z.string(),
+  timezone: z.string(),
+  publicPhotoUrl: z.string().nullable(),
+  publicBio: z.string().nullable().optional(),
+  seoTitle: z.string().nullable().optional(),
+  averageRating: z.number(),
+  reviewCount: z.number(),
+  categories: z.array(DirectoryCategoryOnSpecialistSchema),
+  sampleServices: z.array(DirectorySampleServiceSchema),
+});
+export type SpecialistDirectoryEntry = z.infer<typeof SpecialistDirectoryEntrySchema>;
+
+export const ReviewListItemSchema = z.object({
+  id: z.string(),
+  rating: z.number(),
+  comment: z.string(),
+  createdAt: z.string(),
+  authorLabel: z.string(),
+});
+export type ReviewListItem = z.infer<typeof ReviewListItemSchema>;
+
+export const ReviewListResponseSchema = z.object({
+  items: z.array(ReviewListItemSchema),
+  nextCursor: z.string().nullable(),
+});
+export type ReviewListResponse = z.infer<typeof ReviewListResponseSchema>;

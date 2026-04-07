@@ -2,23 +2,87 @@
   "app": {
     "title": "Agenda Infinity",
     "account": "Account",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "back": "Back"
   },
   "tabs": {
+    "home": "Home",
+    "discover": "Discover",
     "book": "Book",
     "agenda": "Agenda",
     "settings": "Settings",
-    "admin": "Admin"
+    "admin": "Admin",
+    "myPage": "Your page",
+    "availability": "Availability"
+  },
+  "specialistMyPage": {
+    "heroTitle": "Your public page",
+    "heroSub": "How clients see you in the directory.",
+    "noBio": "No public description yet — add one in Settings.",
+    "editInSettings": "Edit profile in Settings",
+    "media": {
+      "profilePhoto": "Profile photo",
+      "changePhoto": "Change photo",
+      "photoHint": "Shown in the directory. Images are optimized to WebP to save bandwidth.",
+      "galleryTitle": "Gallery",
+      "addGallery": "Add image",
+      "removeImage": "Remove image",
+      "noGallery": "No gallery images yet.",
+      "uploadOk": "Saved.",
+      "uploadFail": "Could not upload the image.",
+      "storageUnavailable": "Image storage is not configured on this server.",
+      "removed": "Image removed."
+    }
+  },
+  "specialistAvailability": {
+    "heroTitle": "Availability",
+    "heroSub": "Working hours and bookable services."
+  },
+  "directory": {
+    "title": "Discover",
+    "intro": "Browse specialists by category, compare ratings, and book in a few taps.",
+    "sort": {
+      "recommended": "For you",
+      "rating": "Rating",
+      "name": "Name"
+    },
+    "hintInterests": "Order uses your interests from Settings when you choose “For you”.",
+    "hintGuest": "“For you” boosts specialists you opened recently on this device.",
+    "allCategories": "All",
+    "yourCategories": "Your directory categories",
+    "categoryWithCount": "{{name}} ({{count}})",
+    "sampleServices": "Services:",
+    "bookCta": "Book",
+    "reviewCount": "{{count}} reviews",
+    "loadError": "Could not load specialists.",
+    "empty": "No specialists match this filter.",
+    "searchPlaceholder": "Smart search — name, service, category…",
+    "searchNoResults": "No specialists match your search. Try other words or clear the search.",
+    "createAccount": "Create account"
   },
   "home": {
     "title": "Book",
+    "backToDiscover": "Discover",
     "viewSpecialist": "Specialist",
     "viewCalendar": "Calendar",
     "bookingConflict": "This date/time period is already occupied. Please pick another slot.",
     "bookingFailed": "Could not confirm booking. Please refresh and try another slot.",
     "bookingConfirmed": "Booking confirmed",
     "createSpecialistFirst": "Create a specialist account first to load service-based availability.",
-    "loadingSpecialists": "Loading specialists…"
+    "loadingSpecialists": "Loading specialists…",
+    "directoryCategories": "Categories",
+    "directoryCategoriesAria": "Categories this specialist is listed under",
+    "availablePeriods": {
+      "title": "Upcoming open times",
+      "subtitle": "Soonest bookable slots for the selected service. Tap a row to continue on the calendar.",
+      "serviceLabel": "Service for this list",
+      "serviceOption": "{{name}} ({{minutes}} min)",
+      "loading": "Loading open times…",
+      "empty": "No open times in the next two weeks for this service. Try another service or pick a day on the calendar.",
+      "loadError": "Could not load availability.",
+      "pickSlot": "Book this time",
+      "ariaLabel": "Upcoming bookable times"
+    }
   },
   "bookingForm": {
     "title": "Booking Details",
@@ -126,7 +190,10 @@
     "platformTitle": "Platform",
     "platformBody": "Manage every specialist, service type, banner, and schedule from the Admin tab.",
     "goAdmin": "Go to Admin",
-    "clientHint": "Book visits from the Book tab. Your upcoming appointments are under Agenda.",
+    "clientHint": "Discover specialists on Home and book from their page. Your visits appear in Agenda when you open it from a booking.",
+    "interestsTitle": "Your interests",
+    "interestsHint": "Used to personalize the Discover tab (“For you” sort).",
+    "interestsSave": "Save interests",
     "signOut": "Sign out",
     "workingHours": "Working hours",
     "workingHoursHint": "Local time windows when clients can book.",
@@ -188,7 +255,8 @@
     "pickTimeHint": "Tap the timeline to choose a 30-minute slot.",
     "booked": "Booked",
     "yourSelection": "Your selection",
-    "chooseTimeline": "Choose a start time — tap where you want to book"
+    "chooseTimeline": "Choose a start time — tap where you want to book",
+    "availableSlotsCount": "{{count}} available slots"
   },
   "bookingStatus": {
     "CREATED": {
@@ -210,8 +278,29 @@
       "blocks": "Blocks",
       "types": "Types",
       "banners": "Banners",
-      "services": "Services"
+      "services": "Services",
+      "categories": "Categories",
+      "reviews": "Reviews"
     },
+    "categoriesTitle": "Categories",
+    "categorySlug": "Slug",
+    "categoryNameEn": "Name (EN)",
+    "categoryNameRo": "Name (RO)",
+    "categoryNameRu": "Name (RU)",
+    "addCategory": "Add category",
+    "categorySpecialistCount": "{{count}} specialists in this category",
+    "saveCategory": "Save",
+    "specialistCategoriesTitle": "Specialist categories",
+    "assignCategoriesHint": "Select categories for the chosen specialist.",
+    "saveSpecialistCategories": "Save categories",
+    "reviewsTitle": "Reviews",
+    "reviewSpecialist": "Specialist",
+    "reviewAuthor": "Author",
+    "reviewRating": "Rating",
+    "reviewStatus": "Status",
+    "reviewComment": "Comment",
+    "approveReview": "Approve",
+    "rejectReview": "Reject",
     "directory": "Directory",
     "createUser": "Create user",
     "role": "Role",
@@ -257,8 +346,10 @@
     "back": "Agenda",
     "title": "Session",
     "specialistRequired": "Specialist sign-in required to view this session.",
+    "agendaBookingRoleHint": "Sign in with a client or specialist account to view this booking.",
     "loadError": "Could not load booking.",
     "when": "When",
+    "specialist": "Specialist",
     "client": "Client",
     "noPhone": "No phone on file",
     "accept": "Accept",

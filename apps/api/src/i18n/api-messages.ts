@@ -37,6 +37,21 @@ const en: MessageTable = {
     'Hi {{clientName}}, {{specialistName}} accepted your {{serviceName}} on {{startLabel}}. See you then.',
   notify_decision_deny_body:
     'Hi {{clientName}}, {{specialistName}} could not confirm your {{serviceName}} ({{startLabel}}). Please book another time if you still need an appointment.',
+  review_self_specialist: 'You cannot review your own specialist profile',
+  review_rating_invalid: 'Rating must be an integer from 1 to 5',
+  review_comment_short: 'Comment must be at least 3 characters',
+  review_comment_long: 'Comment must be at most 2000 characters',
+  review_already_exists: 'You already submitted a review for this specialist',
+  interests_too_many: 'Too many categories selected',
+  category_invalid: 'One or more categories are invalid',
+  category_slug_taken: 'Category slug already exists',
+  review_not_found: 'Review not found',
+  storage_not_configured: 'File storage is not configured',
+  media_purpose_invalid: 'purpose must be avatar or gallery',
+  media_file_missing: 'Image file is required',
+  image_invalid: 'Could not read image; use JPEG, PNG, or WebP',
+  gallery_limit: 'Gallery image limit reached',
+  media_not_found: 'Media not found',
 };
 
 const ro: MessageTable = {
@@ -75,6 +90,21 @@ const ro: MessageTable = {
     'Bună, {{clientName}}, {{specialistName}} a acceptat {{serviceName}} pe {{startLabel}}. Ne vedem atunci.',
   notify_decision_deny_body:
     'Bună, {{clientName}}, {{specialistName}} nu a putut confirma {{serviceName}} ({{startLabel}}). Rezervați alt moment dacă mai aveți nevoie.',
+  review_self_specialist: 'Nu vă puteți evalua propriul profil de specialist',
+  review_rating_invalid: 'Evaluarea trebuie să fie un număr întreg între 1 și 5',
+  review_comment_short: 'Comentariul trebuie să aibă cel puțin 3 caractere',
+  review_comment_long: 'Comentariul trebuie să aibă cel mult 2000 de caractere',
+  review_already_exists: 'Ați trimis deja o evaluare pentru acest specialist',
+  interests_too_many: 'Prea multe categorii selectate',
+  category_invalid: 'Una sau mai multe categorii sunt invalide',
+  category_slug_taken: 'Slug-ul categoriei există deja',
+  review_not_found: 'Recenzie negăsită',
+  storage_not_configured: 'Stocarea fișierelor nu este configurată',
+  media_purpose_invalid: 'purpose trebuie să fie avatar sau gallery',
+  media_file_missing: 'Este necesar un fișier imagine',
+  image_invalid: 'Imaginea nu a putut fi citită; folosiți JPEG, PNG sau WebP',
+  gallery_limit: 'Limita de imagini în galerie a fost atinsă',
+  media_not_found: 'Fișier media negăsit',
 };
 
 const ru: MessageTable = {
@@ -112,6 +142,21 @@ const ru: MessageTable = {
     'Здравствуйте, {{clientName}}, {{specialistName}} принял(а) вашу запись на {{serviceName}} на {{startLabel}}. До встречи.',
   notify_decision_deny_body:
     'Здравствуйте, {{clientName}}, {{specialistName}} не смог(ла) подтвердить {{serviceName}} ({{startLabel}}). Запишитесь на другое время, если услуга ещё нужна.',
+  review_self_specialist: 'Нельзя оставить отзыв на свой профиль специалиста',
+  review_rating_invalid: 'Оценка должна быть целым числом от 1 до 5',
+  review_comment_short: 'Комментарий должен содержать не менее 3 символов',
+  review_comment_long: 'Комментарий должен содержать не более 2000 символов',
+  review_already_exists: 'Вы уже оставили отзыв об этом специалисте',
+  interests_too_many: 'Выбрано слишком много категорий',
+  category_invalid: 'Одна или несколько категорий недействительны',
+  category_slug_taken: 'Такой slug категории уже существует',
+  review_not_found: 'Отзыв не найден',
+  storage_not_configured: 'Хранилище файлов не настроено',
+  media_purpose_invalid: 'purpose должен быть avatar или gallery',
+  media_file_missing: 'Требуется файл изображения',
+  image_invalid: 'Не удалось прочитать изображение; используйте JPEG, PNG или WebP',
+  gallery_limit: 'Достигнут лимит изображений в галерее',
+  media_not_found: 'Медиафайл не найден',
 };
 
 const tables: Record<AppLocale, MessageTable> = { en, ro, ru };

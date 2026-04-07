@@ -35,7 +35,7 @@ function App() {
           <Route path="/login" exact component={LoginPage} />
           <Route path="/register" exact component={RegisterPage} />
           <Route path="/admin" exact render={() => <Redirect to="/tabs/admin" />} />
-          <Route path="/" exact render={() => <Redirect to="/tabs/book" />} />
+          <Route path="/" exact render={() => <Redirect to="/tabs/discover" />} />
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>

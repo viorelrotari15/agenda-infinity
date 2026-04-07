@@ -217,6 +217,33 @@ export default function BookingCalendar({
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const todayStart = startOfLocalDay(new Date());
 
+  const weekDaySlotScores = useMemo(() => {
+    if (!workingHoursQuery.isSuccess || !workingRules.length) return new Map<string, number>();
+    const m = new Map<string, number>();
+    for (const d of weekDays) {
+      const dayStart = startOfLocalDay(d);
+      if (dayStart.getTime() < todayStart.getTime()) {
+        m.set(localDateKey(d), 0);
+        continue;
+      }
+      const range = dayWorkingMinutesRange(workingRules, d);
+      if (!range) {
+        m.set(localDateKey(d), 0);
+        continue;
+      }
+      let count = 0;
+      for (let min = range.startMin; min <= range.endMin - 30; min += 30) {
+        const start = new Date(dayStart);
+        start.setMinutes(min);
+        const end = new Date(start.getTime() + SLOT_DURATION_MS);
+        if (!selectAllowSlot(start, end)) continue;
+        count++;
+      }
+      m.set(localDateKey(d), count);
+    }
+    return m;
+  }, [selectAllowSlot, todayStart, weekDays, workingHoursQuery.isSuccess, workingRules]);
+
   const heading = new Intl.DateTimeFormat(loc, {
     weekday: 'long',
     month: 'long',
@@ -293,6 +320,8 @@ export default function BookingCalendar({
           const isPastDay = dayStart.getTime() < todayStart.getTime();
           const label = new Intl.DateTimeFormat(loc, { weekday: 'narrow' }).format(d);
           const num = d.getDate();
+          const score = weekDaySlotScores.get(localDateKey(d)) ?? 0;
+          const scoreTone = score === 0 ? 'zero' : score <= 3 ? 'low' : score <= 8 ? 'mid' : 'high';
           return (
             <button
               key={localDateKey(d)}
@@ -308,6 +337,14 @@ export default function BookingCalendar({
             >
               <span className="agenda-week-day-label">{label}</span>
               <span className="agenda-week-day-num">{num}</span>
+              {!isPastDay ? (
+                <span
+                  className={`agenda-week-day-score agenda-week-day-score--${scoreTone}`}
+                  aria-label={t('agenda.availableSlotsCount', { count: score })}
+                >
+                  {score}
+                </span>
+              ) : null}
             </button>
           );
         })}

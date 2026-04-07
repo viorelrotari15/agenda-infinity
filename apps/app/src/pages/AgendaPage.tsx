@@ -115,7 +115,7 @@ export default function AgendaPage() {
 
   const adminHint = me?.role === 'ADMIN';
   const openBooking =
-    me?.role === 'SPECIALIST'
+    me?.role === 'SPECIALIST' || me?.role === 'CLIENT'
       ? (bookingId: string) => history.push(`/tabs/agenda/booking/${bookingId}`)
       : undefined;
 
@@ -207,7 +207,7 @@ export default function AgendaPage() {
         {me?.role === 'CLIENT' ? (
           <p className="agenda-footer-hint">
             {t('agenda.footerClient')}{' '}
-            <IonRouterLink className="agenda-inline-link" routerLink="/tabs/book">
+            <IonRouterLink className="agenda-inline-link" routerLink="/tabs/discover">
               {t('agenda.bookSlot')}
             </IonRouterLink>
           </p>

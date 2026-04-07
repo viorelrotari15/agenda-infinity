@@ -8,13 +8,27 @@ const apiRoot = path.join(__dirname, '..');
 
 spawnSync(
   'pnpm',
-  ['exec', '--', 'prisma', 'db', 'execute', '--file', 'prisma/sql/remap_legacy_booking_status.sql'],
+  [
+    'exec',
+    '--',
+    'prisma',
+    'db',
+    'execute',
+    '--schema',
+    'prisma/schema.prisma',
+    '--file',
+    'prisma/sql/remap_legacy_booking_status.sql',
+  ],
   { cwd: apiRoot, stdio: 'inherit', shell: true },
 );
 
 const r = spawnSync(
   'pnpm',
-  ['exec', '--', 'prisma', 'db', 'push', '--accept-data-loss'],
-  { cwd: apiRoot, stdio: 'inherit', shell: true },
+  ['exec', '--', 'prisma', 'db', 'push', '--schema', 'prisma/schema.prisma', '--accept-data-loss'],
+  {
+  cwd: apiRoot,
+  stdio: 'inherit',
+  shell: true,
+  },
 );
-process.exit(r.status === 0 ? 0 : r.status ?? 1);
+process.exit(r.status === 0 ? 0 : (r.status ?? 1));

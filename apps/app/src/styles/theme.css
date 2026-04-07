@@ -126,14 +126,22 @@
 
 html {
   -webkit-tap-highlight-color: transparent;
+  height: 100%;
 }
 
 body {
   margin: 0;
+  min-height: 100%;
   font-family:
     -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', system-ui,
     sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Full viewport height so ion-tabs + bottom tab bar layout correctly (avoids blank / clipped chrome). */
+#root,
+ion-app.app-root {
+  height: 100%;
 }
 
 /* Layered mesh — reads as “liquid” depth behind glass panels */
@@ -171,6 +179,76 @@ ion-content.app-content {
   width: 100%;
 }
 
+.home-directory-badges__label {
+  font-size: 13px;
+  color: var(--theme-text-muted, #64748b);
+  margin: 0 0 8px;
+}
+
+.home-directory-badges__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.specialist-available-periods__sub {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: var(--theme-text-muted, #64748b);
+  line-height: 1.45;
+}
+
+.specialist-available-periods__service-field {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 8px;
+}
+
+.specialist-available-periods__service-one {
+  display: block;
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.specialist-available-periods__loading {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.specialist-available-periods__list {
+  max-height: 320px;
+  overflow: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.specialist-available-periods__row {
+  --padding-start: 0;
+  --inner-padding-end: 8px;
+  align-items: flex-start;
+}
+
+.specialist-available-periods__weekday {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: var(--theme-text-muted, #64748b);
+}
+
+.specialist-available-periods__date {
+  margin: 2px 0 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.specialist-available-periods__time {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--theme-text-muted, #64748b);
+}
+
 .app-header ion-toolbar.app-toolbar {
   --background: rgba(255, 255, 255, 0.62);
   --border-width: 0;
@@ -180,6 +258,90 @@ ion-content.app-content {
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.65) inset,
     var(--ui-shadow-soft);
+}
+
+/* Title + optional second row (search): one glass panel, one outer shadow */
+.app-header--with-secondary {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: var(--ui-blur);
+  -webkit-backdrop-filter: var(--ui-blur);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.65) inset,
+    var(--ui-shadow-soft);
+}
+
+.app-header--with-secondary ion-toolbar.app-toolbar {
+  --background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+.app-header--with-secondary ion-toolbar.app-toolbar:first-of-type {
+  --min-height: 50px;
+  padding-bottom: 2px;
+  /* Only inner container padding; ion-toolbar host already applies safe-area insets */
+  --padding-start: max(12px, env(safe-area-inset-left, 0px));
+  --padding-end: max(12px, env(safe-area-inset-right, 0px));
+}
+
+.app-header ion-toolbar.app-toolbar--secondary {
+  display: flex;
+  align-items: stretch;
+  --min-height: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  /* Full-bleed search row: no extra horizontal inset (safe area is on toolbar :host) */
+  --padding-start: 0;
+  --padding-end: 0;
+  padding-top: 0;
+  padding-bottom: 10px;
+  padding-inline: 0;
+  border-top: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+.app-toolbar-secondary-inner {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right));
+  padding-block: 4px 0;
+}
+
+/* Discover: high-contrast search field (sits in header secondary row) */
+ion-searchbar.discover-searchbar {
+  --background: #ffffff;
+  --border-radius: 14px;
+  --box-shadow:
+    0 0 0 1px rgba(79, 70, 229, 0.22), 0 4px 16px rgba(79, 70, 229, 0.1),
+    0 2px 6px rgba(15, 23, 42, 0.06);
+  --color: var(--theme-text);
+  --icon-color: var(--theme-primary);
+  --placeholder-color: var(--theme-text-muted);
+  --clear-button-color: var(--theme-text-tertiary);
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+  padding: 0;
+  margin-block: 0;
+  min-height: 46px;
+  /* Inner padding for the text/icon inside the pill */
+  --padding-start: 14px;
+  --padding-end: 14px;
+}
+
+ion-searchbar.discover-searchbar.searchbar-has-focus {
+  --box-shadow:
+    0 0 0 2px rgba(79, 70, 229, 0.45), 0 6px 20px rgba(79, 70, 229, 0.14),
+    0 2px 8px rgba(15, 23, 42, 0.08);
 }
 
 .app-header ion-title {
@@ -784,8 +946,8 @@ ion-modal.app-select-modal::part(backdrop) {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  max-height: 100%;
-  overflow: auto;
+  max-height: none;
+  overflow: visible;
   padding-left: 0;
   padding-right: 0;
 }
@@ -996,6 +1158,7 @@ ion-modal.app-select-modal::part(backdrop) {
 .booking-form-panel .booking-form-actions {
   margin-top: auto;
   padding-top: 12px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
 }
 
 .booking-calendar-column {
@@ -1235,25 +1398,84 @@ ion-segment {
   --background: var(--ui-surface);
 }
 
-/* Bottom navigation — mobile-first */
+/* Tab shell: IonTabs removed — flex column so outlet + custom nav stack correctly */
+.app-tabs-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  position: relative;
+}
+
+.app-tabs-layout > ion-router-outlet {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+}
+
+/* Extra scroll padding so content clears the fixed bottom bar (custom nav, not ion-tab-bar) */
+.app-tabs-layout ion-page ion-content {
+  --padding-bottom: calc(56px + max(8px, env(safe-area-inset-bottom, 0px)));
+}
+
+/* Bottom navigation — mobile-first (custom <nav>; Ionic ion-tab-bar was unreliable inside IonTabs + PageManager) */
 .main-tab-bar {
-  --background: rgba(255, 255, 255, 0.82);
+  flex: 0 0 auto;
+  --background: rgba(255, 255, 255, 0.96);
+  position: relative;
+  z-index: 100;
+  isolation: isolate;
+  transform: translateZ(0);
   backdrop-filter: var(--ui-blur);
   -webkit-backdrop-filter: var(--ui-blur);
   border-top: 1px solid var(--ui-border-hairline);
   padding-bottom: max(6px, env(safe-area-inset-bottom, 0px));
   min-height: 56px;
+  color: var(--theme-text-muted);
 }
 
-.main-tab-bar ion-tab-button {
-  --color: var(--booking-ink-muted);
-  --color-selected: var(--booking-accent);
+.main-tab-bar--custom {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: space-around;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.main-tab-link {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 52px;
+  padding: 6px 4px 4px;
+  text-decoration: none;
+  color: #5a6b82;
   font-size: 0.7rem;
+  font-weight: 500;
   letter-spacing: 0.02em;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.main-tab-bar ion-icon {
+.main-tab-link__icon {
   font-size: 1.35rem;
+  color: inherit;
+}
+
+.main-tab-link__label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.main-tab-link--active {
+  color: var(--theme-primary);
+  font-weight: 600;
 }
 
 .agenda-page .agenda-h2,
@@ -1548,7 +1770,7 @@ ion-segment {
 }
 
 @media (min-width: 768px) {
-  .main-tab-bar ion-label {
+  .main-tab-link__label {
     font-size: 0.75rem;
   }
 }
@@ -1919,6 +2141,46 @@ button.agenda-session-card--clickable:active {
   font-weight: 650;
 }
 
+.agenda-week-day-score {
+  margin-top: 2px;
+  min-width: 22px;
+  height: 18px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--booking-ink-muted);
+}
+
+.agenda-week-day-score--zero {
+  opacity: 0.6;
+}
+
+.agenda-week-day-score--low {
+  background: rgba(255, 214, 102, 0.38);
+  border-color: rgba(255, 214, 102, 0.55);
+  color: rgba(100, 70, 0, 0.95);
+}
+
+.agenda-week-day-score--mid {
+  background: rgba(var(--ion-color-primary-rgb), 0.14);
+  border-color: rgba(var(--ion-color-primary-rgb), 0.22);
+  color: var(--booking-accent-strong);
+}
+
+.agenda-week-day-score--high {
+  background: rgba(88, 214, 141, 0.24);
+  border-color: rgba(88, 214, 141, 0.38);
+  color: rgba(0, 90, 45, 0.95);
+}
+
 .agenda-timeline-wrap {
   display: grid;
   grid-template-columns: 46px minmax(0, 1fr);
@@ -2228,4 +2490,291 @@ ion-toast.app-toast-ios.app-toast-ios--danger.toast-translucent::part(wrapper) {
     0 16px 48px rgba(var(--theme-destructive-rgb), 0.12),
     0 6px 16px rgba(15, 23, 42, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+/* Discover: full-width column (no max-width card) — aligns with header edge-to-edge */
+ion-content.discover-content {
+  --padding-start: 0;
+  --padding-end: 0;
+}
+
+/* Discover / specialist directory */
+.discover-page {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 16px max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .discover-page {
+    padding-inline: clamp(20px, 4vw, 48px);
+  }
+}
+
+.discover-page__intro {
+  margin: 0 0 12px;
+  color: var(--theme-text-muted, #64748b);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.discover-page__sort {
+  margin-bottom: 8px;
+}
+
+.discover-page__hint {
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.discover-page__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.discover-page__my-badges {
+  margin-bottom: 12px;
+}
+
+.discover-page__my-badges-label {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--theme-text-muted, #64748b);
+}
+
+.discover-page__loading,
+.discover-page__error,
+.discover-page__empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--theme-text-muted, #64748b);
+}
+
+.discover-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .discover-page__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+    gap: 16px;
+    align-items: stretch;
+  }
+}
+
+.discover-page__auth {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.rating-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  vertical-align: middle;
+}
+
+.rating-stars__icon {
+  color: var(--theme-warm, #f59e0b);
+}
+
+.specialist-dir-card {
+  margin: 0;
+  border-radius: 16px;
+}
+
+.specialist-dir-card__row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.specialist-dir-card__media {
+  flex: 0 0 auto;
+  padding-top: 14px;
+  padding-inline-start: 14px;
+}
+
+.specialist-dir-card__main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.specialist-dir-card__avatar {
+  width: 72px;
+  height: 72px;
+  --border-radius: 14px;
+}
+
+.specialist-dir-card__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.specialist-dir-card__avatar-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: var(--theme-primary);
+  background: rgba(var(--ion-color-primary-rgb), 0.12);
+}
+
+.specialist-dir-card__main ion-card-header {
+  padding-inline-start: 0;
+  padding-top: 14px;
+}
+
+.specialist-dir-card__main ion-card-content {
+  padding-inline-start: 0;
+}
+
+.specialist-dir-card__title {
+  font-size: 1.15rem;
+}
+
+.specialist-dir-card__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.specialist-dir-card__rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.specialist-dir-card__rating-text {
+  font-size: 13px;
+  color: var(--theme-text-muted, #64748b);
+}
+
+.specialist-dir-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.specialist-dir-card__chip {
+  height: 28px;
+  font-size: 12px;
+}
+
+.specialist-dir-card__services {
+  font-size: 14px;
+  margin: 0 0 8px;
+  color: var(--theme-text-muted, #64748b);
+}
+
+.specialist-dir-card__bio {
+  font-size: 14px;
+  margin: 0 0 12px;
+  line-height: 1.4;
+}
+
+.specialist-dir-card__cta {
+  display: inline-block;
+  font-weight: 600;
+  color: var(--theme-primary);
+  text-decoration: none;
+}
+
+/* Specialist profile media (MinIO / public URLs) */
+.specialist-media-file-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.specialist-media-avatar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.specialist-media-avatar-frame {
+  width: 96px;
+  height: 96px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--theme-pill-track, #f5f7ff);
+  flex-shrink: 0;
+}
+
+.specialist-media-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.specialist-media-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-text-tertiary, #8e8e93);
+  font-size: 40px;
+}
+
+.specialist-media-hint {
+  font-size: 13px;
+  line-height: 1.35;
+  margin-bottom: 0;
+}
+
+.specialist-media-gallery {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.specialist-media-gallery-item {
+  position: relative;
+  margin: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--theme-pill-track, #f5f7ff);
+}
+
+.specialist-media-gallery-img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+
+.specialist-media-gallery-item ion-button {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  --padding-start: 6px;
+  --padding-end: 6px;
 }

@@ -1,5 +1,6 @@
 import {
   IonButton,
+  IonCheckbox,
   IonContent,
   IonInput,
   IonItem,
@@ -30,7 +31,7 @@ export default function AdminPage() {
   const selectModal = useSelectModalInterface();
   const daysShort = t('daysShort', { returnObjects: true }) as string[];
   const adminTabs = useMemo((): PillSegmentOption<
-    'users' | 'hours' | 'blocks' | 'types' | 'banners' | 'services'
+    'users' | 'hours' | 'blocks' | 'types' | 'banners' | 'services' | 'categories' | 'reviews'
   >[] => {
     return [
       { value: 'users', label: t('admin.tabs.users') },
@@ -39,15 +40,17 @@ export default function AdminPage() {
       { value: 'types', label: t('admin.tabs.types') },
       { value: 'banners', label: t('admin.tabs.banners') },
       { value: 'services', label: t('admin.tabs.services') },
+      { value: 'categories', label: t('admin.tabs.categories') },
+      { value: 'reviews', label: t('admin.tabs.reviews') },
     ];
   }, [t]);
   const queryClient = useQueryClient();
   const meQuery = useMeQuery(hasStoredAccessToken());
   const me = meQuery.data;
 
-  const [tab, setTab] = useState<'users' | 'hours' | 'blocks' | 'types' | 'banners' | 'services'>(
-    'users',
-  );
+  const [tab, setTab] = useState<
+    'users' | 'hours' | 'blocks' | 'types' | 'banners' | 'services' | 'categories' | 'reviews'
+  >('users');
   const [specialistId, setSpecialistId] = useState('');
 
   const usersQuery = useQuery({
@@ -246,6 +249,84 @@ export default function AdminPage() {
     },
   });
 
+  const adminCategoriesQuery = useQuery({
+    queryKey: [...agendaKeys.all, 'admin', 'categories'],
+    queryFn: () => api.adminListCategories(),
+    enabled: me?.role === 'ADMIN',
+  });
+
+  const specialistCatsQuery = useQuery({
+    queryKey: [...agendaKeys.all, 'admin', 'specialist-cats', specialistId],
+    queryFn: () => api.adminGetSpecialistCategories(specialistId),
+    enabled: Boolean(specialistId) && me?.role === 'ADMIN' && tab === 'categories',
+  });
+
+  const [selectedCatIds, setSelectedCatIds] = useState<string[]>([]);
+  const [primaryCatId, setPrimaryCatId] = useState<string>('');
+  useEffect(() => {
+    const rows = specialistCatsQuery.data ?? [];
+    const ids = rows.map((r) => r.categoryId);
+    setSelectedCatIds(ids);
+    const primary = rows.find((r) => r.isPrimary);
+    setPrimaryCatId(primary?.categoryId ?? ids[0] ?? '');
+  }, [specialistCatsQuery.data]);
+
+  const [categoryForm, setCategoryForm] = useState({
+    slug: '',
+    nameEn: '',
+    nameRo: '',
+    nameRu: '',
+  });
+
+  const createCategoryMutation = useMutation({
+    mutationFn: () =>
+      api.adminCreateCategory({
+        slug: categoryForm.slug.trim(),
+        nameEn: categoryForm.nameEn.trim(),
+        nameRo: categoryForm.nameRo.trim(),
+        nameRu: categoryForm.nameRu.trim(),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...agendaKeys.all, 'admin', 'categories'] });
+      queryClient.invalidateQueries({ queryKey: agendaKeys.publicCategories() });
+      setCategoryForm({ slug: '', nameEn: '', nameRo: '', nameRu: '' });
+    },
+  });
+
+  const saveSpecialistCatsMutation = useMutation({
+    mutationFn: () =>
+      api.adminSetSpecialistCategories(specialistId, {
+        categoryIds: selectedCatIds,
+        primaryCategoryId: primaryCatId || null,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [...agendaKeys.all, 'admin', 'specialist-cats', specialistId],
+      });
+      queryClient.invalidateQueries({ queryKey: agendaKeys.all });
+    },
+  });
+
+  const [reviewStatusFilter, setReviewStatusFilter] = useState<
+    'PENDING' | 'APPROVED' | 'REJECTED' | ''
+  >('PENDING');
+
+  const adminReviewsQuery = useQuery({
+    queryKey: [...agendaKeys.all, 'admin', 'reviews', reviewStatusFilter],
+    queryFn: () =>
+      api.adminListReviews(reviewStatusFilter ? { status: reviewStatusFilter } : undefined),
+    enabled: me?.role === 'ADMIN' && tab === 'reviews',
+  });
+
+  const moderateReviewMutation = useMutation({
+    mutationFn: (p: { id: string; status: 'APPROVED' | 'REJECTED' }) =>
+      api.adminModerateReview(p.id, { status: p.status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [...agendaKeys.all, 'admin', 'reviews'] });
+      queryClient.invalidateQueries({ queryKey: agendaKeys.all });
+    },
+  });
+
   if (meQuery.isLoading) {
     return (
       <IonPage>
@@ -258,7 +339,7 @@ export default function AdminPage() {
   }
 
   if (!me || me.role !== 'ADMIN') {
-    return <Redirect to="/tabs/book" />;
+    return <Redirect to="/tabs/discover" />;
   }
 
   return (
@@ -711,6 +792,204 @@ export default function AdminPage() {
               <IonButton expand="block" onClick={() => createServiceMutation.mutate()}>
                 {t('admin.createService')}
               </IonButton>
+            </section>
+          ) : null}
+
+          {tab === 'categories' ? (
+            <section className="admin-section">
+              <h2 className="admin-h2">{t('admin.categoriesTitle')}</h2>
+              <IonList lines="full">
+                {(adminCategoriesQuery.data ?? []).map((c) => (
+                  <IonItem key={c.id}>
+                    <IonLabel>
+                      <h3>{c.slug}</h3>
+                      <p>
+                        {c.nameEn} · {c.nameRo} · {c.nameRu}
+                      </p>
+                      <p className="ion-text-wrap ion-margin-top">
+                        {t('admin.categorySpecialistCount', { count: c._count.specialists })}
+                      </p>
+                    </IonLabel>
+                    <IonToggle
+                      checked={c.active}
+                      onIonChange={(e) =>
+                        api.adminUpdateCategory(c.id, { active: e.detail.checked }).then(() => {
+                          queryClient.invalidateQueries({
+                            queryKey: [...agendaKeys.all, 'admin', 'categories'],
+                          });
+                          queryClient.invalidateQueries({
+                            queryKey: agendaKeys.publicCategories(),
+                          });
+                        })
+                      }
+                    />
+                  </IonItem>
+                ))}
+              </IonList>
+              <IonItem>
+                <IonInput
+                  label={t('admin.categorySlug')}
+                  labelPlacement="stacked"
+                  value={categoryForm.slug}
+                  onIonInput={(e) =>
+                    setCategoryForm({ ...categoryForm, slug: e.detail.value ?? '' })
+                  }
+                />
+              </IonItem>
+              <IonItem>
+                <IonInput
+                  label={t('admin.categoryNameEn')}
+                  labelPlacement="stacked"
+                  value={categoryForm.nameEn}
+                  onIonInput={(e) =>
+                    setCategoryForm({ ...categoryForm, nameEn: e.detail.value ?? '' })
+                  }
+                />
+              </IonItem>
+              <IonItem>
+                <IonInput
+                  label={t('admin.categoryNameRo')}
+                  labelPlacement="stacked"
+                  value={categoryForm.nameRo}
+                  onIonInput={(e) =>
+                    setCategoryForm({ ...categoryForm, nameRo: e.detail.value ?? '' })
+                  }
+                />
+              </IonItem>
+              <IonItem>
+                <IonInput
+                  label={t('admin.categoryNameRu')}
+                  labelPlacement="stacked"
+                  value={categoryForm.nameRu}
+                  onIonInput={(e) =>
+                    setCategoryForm({ ...categoryForm, nameRu: e.detail.value ?? '' })
+                  }
+                />
+              </IonItem>
+              <IonButton expand="block" onClick={() => createCategoryMutation.mutate()}>
+                {t('admin.addCategory')}
+              </IonButton>
+
+              <h2 className="admin-h2 ion-margin-top">{t('admin.specialistCategoriesTitle')}</h2>
+              <IonText color="medium">
+                <p>{t('admin.assignCategoriesHint')}</p>
+              </IonText>
+              <IonItem>
+                <IonLabel position="stacked">{t('admin.specialistPick')}</IonLabel>
+                <IonSelect
+                  key={selectModal ? 'if-modal' : 'if-alert'}
+                  interface={selectModal ? 'modal' : 'alert'}
+                  value={specialistId}
+                  onIonChange={(e) => setSpecialistId(String(e.detail.value ?? ''))}
+                >
+                  {(specialistsQuery.data ?? []).map((s) => (
+                    <IonSelectOption key={s.id} value={s.id}>
+                      {t('admin.specialistOption', { name: s.displayName, slug: s.slug })}
+                    </IonSelectOption>
+                  ))}
+                </IonSelect>
+              </IonItem>
+              {specialistId ? (
+                <>
+                  {(adminCategoriesQuery.data ?? [])
+                    .filter((c) => c.active)
+                    .map((c) => (
+                      <IonItem key={c.id}>
+                        <IonCheckbox
+                          slot="start"
+                          checked={selectedCatIds.includes(c.id)}
+                          onIonChange={(e) => {
+                            const on = Boolean(e.detail.checked);
+                            setSelectedCatIds((prev) =>
+                              on ? [...new Set([...prev, c.id])] : prev.filter((id) => id !== c.id),
+                            );
+                          }}
+                        />
+                        <IonLabel>{c.nameEn}</IonLabel>
+                      </IonItem>
+                    ))}
+                  <IonItem>
+                    <IonLabel position="stacked">Primary category</IonLabel>
+                    <IonSelect
+                      value={primaryCatId}
+                      onIonChange={(e) => setPrimaryCatId(String(e.detail.value ?? ''))}
+                    >
+                      {selectedCatIds.map((id) => {
+                        const c = (adminCategoriesQuery.data ?? []).find((x) => x.id === id);
+                        return c ? (
+                          <IonSelectOption key={id} value={id}>
+                            {c.nameEn}
+                          </IonSelectOption>
+                        ) : null;
+                      })}
+                    </IonSelect>
+                  </IonItem>
+                  <IonButton
+                    expand="block"
+                    onClick={() => saveSpecialistCatsMutation.mutate()}
+                    disabled={saveSpecialistCatsMutation.isPending}
+                  >
+                    {t('admin.saveSpecialistCategories')}
+                  </IonButton>
+                </>
+              ) : null}
+            </section>
+          ) : null}
+
+          {tab === 'reviews' ? (
+            <section className="admin-section">
+              <h2 className="admin-h2">{t('admin.reviewsTitle')}</h2>
+              <IonItem lines="none">
+                <IonLabel position="stacked">{t('admin.reviewStatus')}</IonLabel>
+                <IonSelect
+                  value={reviewStatusFilter}
+                  onIonChange={(e) =>
+                    setReviewStatusFilter(
+                      (e.detail.value as 'PENDING' | 'APPROVED' | 'REJECTED' | '') ?? '',
+                    )
+                  }
+                >
+                  <IonSelectOption value="PENDING">PENDING</IonSelectOption>
+                  <IonSelectOption value="APPROVED">APPROVED</IonSelectOption>
+                  <IonSelectOption value="REJECTED">REJECTED</IonSelectOption>
+                  <IonSelectOption value="">ALL</IonSelectOption>
+                </IonSelect>
+              </IonItem>
+              <IonList lines="full">
+                {(adminReviewsQuery.data ?? []).map((r) => (
+                  <IonItem key={r.id}>
+                    <IonLabel className="ion-text-wrap">
+                      <h3>{r.specialist.displayName}</h3>
+                      <p>
+                        {r.author.email} · {r.rating}★ · {r.status}
+                      </p>
+                      <p>{r.comment}</p>
+                    </IonLabel>
+                    {r.status === 'PENDING' ? (
+                      <>
+                        <IonButton
+                          size="small"
+                          onClick={() =>
+                            moderateReviewMutation.mutate({ id: r.id, status: 'APPROVED' })
+                          }
+                        >
+                          {t('admin.approveReview')}
+                        </IonButton>
+                        <IonButton
+                          size="small"
+                          color="medium"
+                          fill="outline"
+                          onClick={() =>
+                            moderateReviewMutation.mutate({ id: r.id, status: 'REJECTED' })
+                          }
+                        >
+                          {t('admin.rejectReview')}
+                        </IonButton>
+                      </>
+                    ) : null}
+                  </IonItem>
+                ))}
+              </IonList>
             </section>
           ) : null}
         </div>

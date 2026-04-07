@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= it.titlePage %></title>
+  <meta name="description" content="<%= it.metaDesc %>" />
+  <link rel="canonical" href="<%= it.canonical %>" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="<%= it.titlePage %>" />
+  <meta property="og:description" content="<%= it.metaDesc %>" />
+  <meta property="og:url" content="<%= it.canonical %>" />
+  <meta property="og:site_name" content="<%= it.siteName %>" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="<%= it.titlePage %>" />
+  <meta name="twitter:description" content="<%= it.metaDesc %>" />
+  <script type="application/ld+json"><%~ it.jsonLdStr %></script>
+  <style>
+    body { font-family: system-ui, sans-serif; line-height: 1.5; max-width: 42rem; margin: 2rem auto; padding: 0 1rem; color: #0b1220; background: #f1f3f8; }
+    h1 { font-size: 1.75rem; }
+    a.cta { display: inline-block; margin-top: 1rem; padding: 0.75rem 1.25rem; background: #5b5ff6; color: #fff; text-decoration: none; border-radius: 999px; font-weight: 600; }
+    a.cta:focus { outline: 2px solid #4aa3ff; outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1><%= it.categoryName %></h1>
+    <p>Specialists in this category. Compare ratings and book online.</p>
+    <p><a class="cta" href="<%= it.appHref %>">View in app</a></p>
+  </main>
+</body>
+</html>

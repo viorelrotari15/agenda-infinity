@@ -22,6 +22,10 @@ export default tseslint.config(
       'playwright.config.ts',
       '**/vitest.config.ts',
       'apps/api/jest.config.cjs',
+      // When eslint runs from package subdirs, paths are relative to that CWD.
+      'apps/api/scripts/**/*.cjs',
+      'scripts/**/*.cjs',
+      '**/scripts/**/*.cjs',
       'perf/**',
     ],
   },

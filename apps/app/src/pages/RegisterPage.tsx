@@ -43,7 +43,7 @@ export default function RegisterPage() {
         password: values.password,
       });
       await queryClient.invalidateQueries({ queryKey: agendaKeys.me() });
-      history.push('/tabs/book');
+      history.push('/tabs/discover');
     } catch (e) {
       setError(e instanceof Error ? e.message : t('auth.registrationFailed'));
     }
@@ -51,7 +51,7 @@ export default function RegisterPage() {
 
   return (
     <IonPage>
-      <AppHeader title={t('auth.registerTitle')} />
+      <AppHeader title={t('auth.registerTitle')} backHref="/tabs/discover" />
       <IonContent fullscreen className="app-content ion-padding auth-page">
         <div className="auth-panel ui-elevated">
           <IonText>

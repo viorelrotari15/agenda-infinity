@@ -43,7 +43,7 @@ export default function LoginPage() {
       });
       setSessionTokens(tokens);
       await queryClient.invalidateQueries({ queryKey: agendaKeys.me() });
-      history.push('/tabs/book');
+      history.push('/tabs/discover');
     } catch (e) {
       setError(e instanceof Error ? e.message : t('auth.signInFailed'));
     }
@@ -51,7 +51,7 @@ export default function LoginPage() {
 
   return (
     <IonPage>
-      <AppHeader title={t('auth.signInTitle')} />
+      <AppHeader title={t('auth.signInTitle')} backHref="/tabs/discover" />
       <IonContent fullscreen className="app-content ion-padding auth-page">
         <div className="auth-panel ui-elevated">
           <IonText>

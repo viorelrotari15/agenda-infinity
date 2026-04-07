@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Agenda Infinity (built app)', () => {
-  test('root redirects to book tab', async ({ page }) => {
+  test('root redirects to discover tab', async ({ page }) => {
     await page.goto('/');
-    await expect(page).toHaveURL(/\/tabs\/book/);
+    await expect(page).toHaveURL(/\/tabs\/discover/);
   });
 
   test('login page shows primary actions', async ({ page }) => {

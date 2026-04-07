@@ -1,17 +1,22 @@
 import type {
   BannerPublic,
   BookingEvent,
+  CategoryPublic,
   CreateBookingInput,
   MeUser,
+  ReviewListResponse,
   ServiceDto,
   Slot,
+  ClientBookingDetail,
   SpecialistBookingDetail,
+  SpecialistCategoryBadge,
+  SpecialistDirectoryEntry,
   SpecialistPublic,
   WorkingHoursRule,
 } from '@agenda/shared';
 import axios, { AxiosHeaders, type AxiosInstance, isAxiosError } from 'axios';
 
-export type { CreateBookingInput, SpecialistBookingDetail } from '@agenda/shared';
+export type { ClientBookingDetail, CreateBookingInput, SpecialistBookingDetail } from '@agenda/shared';
 
 export interface AuthTokens {
   accessToken: string;
@@ -186,6 +191,50 @@ export class AgendaApiClient {
 
   listBanners(): Promise<BannerPublic[]> {
     return this.request('GET', '/banners');
+  }
+
+  listPublicCategories(): Promise<CategoryPublic[]> {
+    return this.request('GET', '/public/categories');
+  }
+
+  getSpecialistDirectoryCategories(specialistId: string): Promise<SpecialistCategoryBadge[]> {
+    return this.request(
+      'GET',
+      `/specialists/${encodeURIComponent(specialistId)}/directory-categories`,
+    );
+  }
+
+  listPublicSpecialists(params?: {
+    categorySlug?: string;
+    sort?: 'rating' | 'name' | 'recommended';
+  }): Promise<SpecialistDirectoryEntry[]> {
+    const q = new URLSearchParams();
+    if (params?.categorySlug) q.set('categorySlug', params.categorySlug);
+    if (params?.sort) q.set('sort', params.sort);
+    const suffix = q.toString() ? `?${q}` : '';
+    return this.request('GET', `/public/specialists${suffix}`);
+  }
+
+  getSpecialistReviews(specialistId: string, cursor?: string): Promise<ReviewListResponse> {
+    const q = new URLSearchParams();
+    if (cursor) q.set('cursor', cursor);
+    const suffix = q.toString() ? `?${q}` : '';
+    return this.request('GET', `/specialists/${encodeURIComponent(specialistId)}/reviews${suffix}`);
+  }
+
+  createReview(
+    specialistId: string,
+    body: { rating: number; comment: string },
+  ): Promise<{ id: string; status: string; createdAt: string }> {
+    return this.request('POST', `/specialists/${encodeURIComponent(specialistId)}/reviews`, body);
+  }
+
+  getClientInterests(): Promise<{ categoryIds: string[] }> {
+    return this.request('GET', '/client/interests');
+  }
+
+  setClientInterests(categoryIds: string[]): Promise<{ categoryIds: string[] }> {
+    return this.request('PUT', '/client/interests', { categoryIds });
   }
 
   adminListUsers(): Promise<
@@ -380,6 +429,114 @@ export class AgendaApiClient {
     return this.request('PUT', `/admin/services/${serviceId}`, body);
   }
 
+  adminListCategories(): Promise<
+    Array<{
+      id: string;
+      slug: string;
+      nameEn: string;
+      nameRo: string;
+      nameRu: string;
+      sortOrder: number;
+      active: boolean;
+      _count: { specialists: number };
+    }>
+  > {
+    return this.request('GET', '/admin/categories');
+  }
+
+  adminCreateCategory(body: {
+    slug: string;
+    nameEn: string;
+    nameRo: string;
+    nameRu: string;
+    sortOrder?: number;
+    active?: boolean;
+  }): Promise<{ id: string }> {
+    return this.request('POST', '/admin/categories', body);
+  }
+
+  adminUpdateCategory(
+    id: string,
+    body: Partial<{
+      slug: string;
+      nameEn: string;
+      nameRo: string;
+      nameRu: string;
+      sortOrder: number;
+      active: boolean;
+    }>,
+  ): Promise<unknown> {
+    return this.request('PUT', `/admin/categories/${id}`, body);
+  }
+
+  adminGetSpecialistCategories(specialistId: string): Promise<
+    Array<{
+      specialistId: string;
+      categoryId: string;
+      isPrimary: boolean;
+      category: {
+        id: string;
+        slug: string;
+        nameEn: string;
+        nameRo: string;
+        nameRu: string;
+        sortOrder: number;
+        active: boolean;
+      };
+    }>
+  > {
+    return this.request('GET', `/admin/specialists/${specialistId}/categories`);
+  }
+
+  adminSetSpecialistCategories(
+    specialistId: string,
+    body: { categoryIds: string[]; primaryCategoryId?: string | null },
+  ): Promise<
+    Array<{
+      specialistId: string;
+      categoryId: string;
+      isPrimary: boolean;
+      category: {
+        id: string;
+        slug: string;
+        nameEn: string;
+        nameRo: string;
+        nameRu: string;
+        sortOrder: number;
+        active: boolean;
+      };
+    }>
+  > {
+    return this.request('PUT', `/admin/specialists/${specialistId}/categories`, body);
+  }
+
+  adminListReviews(params?: { status?: 'PENDING' | 'APPROVED' | 'REJECTED' }): Promise<
+    Array<{
+      id: string;
+      specialistId: string;
+      authorUserId: string;
+      rating: number;
+      comment: string;
+      status: string;
+      createdAt: string;
+      updatedAt: string;
+      specialist: { id: string; displayName: string; slug: string };
+      author: { id: string; email: string };
+    }>
+  > {
+    const q = new URLSearchParams();
+    if (params?.status) q.set('status', params.status);
+    const suffix = q.toString() ? `?${q}` : '';
+    return this.request('GET', `/admin/reviews${suffix}`);
+  }
+
+  adminModerateReview(
+    reviewId: string,
+    body: { status: 'PENDING' | 'APPROVED' | 'REJECTED' },
+  ): Promise<unknown> {
+    return this.request('PATCH', `/admin/reviews/${reviewId}`, body);
+  }
+
   specialistBookings(params: { from: string; to: string }): Promise<BookingEvent[]> {
     const q = new URLSearchParams(params);
     return this.request('GET', `/specialist/bookings?${q}`);
@@ -412,6 +569,10 @@ export class AgendaApiClient {
   > {
     const q = new URLSearchParams(params);
     return this.request('GET', `/client/bookings?${q}`);
+  }
+
+  clientBooking(id: string): Promise<ClientBookingDetail> {
+    return this.request('GET', `/client/bookings/${encodeURIComponent(id)}`);
   }
 
   listMyServices(): Promise<ServiceDto[]> {
@@ -450,5 +611,34 @@ export class AgendaApiClient {
   cancelBooking(id: string, scope?: 'this' | 'series'): Promise<void> {
     const q = scope ? `?scope=${scope}` : '';
     return this.request('DELETE', `/bookings/${id}${q}`);
+  }
+
+  uploadSpecialistMedia(
+    file: File,
+    purpose: 'avatar' | 'gallery',
+  ): Promise<
+    | { kind: 'avatar'; publicUrl: string }
+    | {
+        kind: 'gallery';
+        id: string;
+        publicUrl: string;
+        sortOrder: number;
+        createdAt: string;
+      }
+  > {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('purpose', purpose);
+    return this.request('POST', '/specialist/media', fd);
+  }
+
+  listSpecialistGallery(): Promise<
+    Array<{ id: string; publicUrl: string; sortOrder: number; createdAt: string }>
+  > {
+    return this.request('GET', '/specialist/media');
+  }
+
+  deleteSpecialistGalleryImage(id: string): Promise<{ ok: boolean }> {
+    return this.request('DELETE', `/specialist/media/${encodeURIComponent(id)}`);
   }
 }

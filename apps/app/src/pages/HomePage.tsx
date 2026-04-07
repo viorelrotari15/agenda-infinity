@@ -25,6 +25,7 @@ import { useAppToast } from '../lib/appToast';
 export default function HomePage() {
   const { t } = useTranslation();
   const location = useLocation();
+  const bookOnlyFlow = new URLSearchParams(location.search).get('bookOnly') === '1';
   const { presentSuccess } = useAppToast();
   const [specialistId, setSpecialistId] = useState('');
   const [selectedService, setSelectedService] = useState('');
@@ -38,7 +39,9 @@ export default function HomePage() {
   >([]);
   const [bookingError, setBookingError] = useState('');
   const [calendarRefreshNonce, setCalendarRefreshNonce] = useState(0);
-  const [view, setView] = useState<'specialist' | 'calendar'>('specialist');
+  const [view, setView] = useState<'specialist' | 'calendar'>(() =>
+    bookOnlyFlow ? 'calendar' : 'specialist',
+  );
   const {
     register,
     handleSubmit,
@@ -72,6 +75,10 @@ export default function HomePage() {
 
   const bookingCalendarLayoutRef = useRef<HTMLDivElement>(null);
   const [bookingCalendarFillHeight, setBookingCalendarFillHeight] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (bookOnlyFlow) setView('calendar');
+  }, [bookOnlyFlow]);
 
   useEffect(() => {
     if (!specialists.length) return;
@@ -169,6 +176,12 @@ export default function HomePage() {
         ).toISOString()
       : '';
 
+  useEffect(() => {
+    // If the desktop booking form sidebar is visible, let the layout grow naturally to fit its content.
+    // A forced height clips the form fields.
+    if (showDesktopBookingForm) setBookingCalendarFillHeight(null);
+  }, [showDesktopBookingForm]);
+
   const bookingSlotSummary = useMemo(() => {
     if (!selectedSlot) return null;
     const start = new Date(selectedSlot);
@@ -214,6 +227,16 @@ export default function HomePage() {
     }
   };
 
+  const pickAvailableSlotFromList = (startIso: string, serviceId: string) => {
+    setSelectedService(serviceId);
+    setBookingError('');
+    setSelectedSlot(startIso);
+    setView('calendar');
+    if (isMobileViewport) {
+      setIsBookingModalOpen(true);
+    }
+  };
+
   const selectServiceAndGoToCalendar = (serviceId: string) => {
     setSelectedService(serviceId);
     setView('calendar');
@@ -236,6 +259,9 @@ export default function HomePage() {
       });
       await queryClient.invalidateQueries({
         queryKey: [...agendaKeys.all, 'occupied'],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: [...agendaKeys.all, 'availability'],
       });
     } catch (error) {
       setBookingError(error instanceof Error ? error.message : t('home.bookingFailed'));
@@ -276,29 +302,22 @@ export default function HomePage() {
 
   return (
     <IonPage>
-      <AppHeader title={t('home.title')} />
+      <AppHeader
+        title={t('home.title')}
+        backHref={bookOnlyFlow ? '/tabs/discover' : undefined}
+        backText={bookOnlyFlow ? t('home.backToDiscover') : undefined}
+      />
       <IonContent fullscreen className="app-content ion-padding">
         <div className="home-page-shell">
-          <HomeViewSegment value={view} onChange={setView} />
+          {!bookOnlyFlow ? <HomeViewSegment value={view} onChange={setView} /> : null}
 
-          {view === 'specialist' ? (
-            <SpecialistTabView
-              specialistsQuery={specialistsQuery}
-              specialistId={specialistId}
-              activeSpecialist={activeSpecialist}
-              specialistPhotos={specialistPhotos}
-              services={services}
-              isMobileViewport={isMobileViewport}
-              selectedService={selectedService}
-              onSelectServiceAndGoToCalendar={selectServiceAndGoToCalendar}
-            />
-          ) : (
+          {bookOnlyFlow || view === 'calendar' ? (
             <CalendarTabView
               services={services}
               selectedService={selectedService}
               onSelectedServiceChange={setSelectedService}
               selectedServiceDetails={selectedServiceDetails}
-              onChangeServiceView={() => setView('specialist')}
+              onChangeServiceView={bookOnlyFlow ? () => {} : () => setView('specialist')}
               bookingCalendarLayoutRef={bookingCalendarLayoutRef}
               showDesktopBookingForm={showDesktopBookingForm}
               bookingCalendarFillHeight={bookingCalendarFillHeight}
@@ -314,6 +333,18 @@ export default function HomePage() {
               isBookingModalOpen={isBookingModalOpen}
               onBookingModalDismiss={() => setIsBookingModalOpen(false)}
               bookingFormModalContent={bookingFormPanel}
+            />
+          ) : (
+            <SpecialistTabView
+              specialistsQuery={specialistsQuery}
+              specialistId={specialistId}
+              activeSpecialist={activeSpecialist}
+              specialistPhotos={specialistPhotos}
+              services={services}
+              isMobileViewport={isMobileViewport}
+              selectedService={selectedService}
+              onSelectServiceAndGoToCalendar={selectServiceAndGoToCalendar}
+              onPickAvailableSlot={pickAvailableSlotFromList}
             />
           )}
         </div>

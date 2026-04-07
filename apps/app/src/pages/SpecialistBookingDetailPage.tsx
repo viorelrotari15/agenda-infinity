@@ -5,7 +5,6 @@ import {
   IonContent,
   IonHeader,
   IonPage,
-  IonSpinner,
   IonText,
   IonTitle,
   IonToolbar,
@@ -14,6 +13,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { bookingStatusClass, bookingStatusLabel } from '../components/agenda/bookingStatusUi';
+import { CenteredPageSpinner } from '../components/CenteredPageSpinner';
 import { api } from '../lib/api';
 import { hasStoredAccessToken } from '../lib/auth-session';
 import { agendaKeys } from '../lib/query-keys';
@@ -48,7 +48,7 @@ export default function SpecialistBookingDetailPage() {
     },
   });
 
-  if (meQuery.isPending) {
+  if (meQuery.isLoading) {
     return (
       <IonPage>
         <IonHeader>
@@ -60,7 +60,7 @@ export default function SpecialistBookingDetailPage() {
           </IonToolbar>
         </IonHeader>
         <IonContent className="ion-padding">
-          <IonSpinner name="crescent" />
+          <CenteredPageSpinner />
         </IonContent>
       </IonPage>
     );
@@ -109,9 +109,7 @@ export default function SpecialistBookingDetailPage() {
       </IonHeader>
       <IonContent fullscreen className="app-content ion-padding specialist-booking-detail">
         {q.isPending ? (
-          <div className="specialist-booking-detail-loading">
-            <IonSpinner name="crescent" />
-          </div>
+          <CenteredPageSpinner className="specialist-booking-detail-loading" />
         ) : q.isError ? (
           <IonText color="danger">
             <p>{q.error instanceof Error ? q.error.message : t('sessionDetail.loadError')}</p>
